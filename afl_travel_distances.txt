@@ -1,0 +1,23 @@
+# Travel distance table
+# All distances are in km
+# http://www.travelmath.com/ for flight path distances except for Euroa and Yallourn (not available)
+# Yallourn and Euroa are driving distances using Google Maps
+
+# Rows are ground locations, cols are team locations
+
+                  Melbourne   Sydney  Adelaide  Brisbane  Perth
+Melbourne         0           713     655       1370      2730
+Sydney            713         0       1165      728       3301
+Adelaide          655         1165    0         1599      2138
+Brisbane          1370        728     1599      0         3614
+Perth             2730        3301    2138      3614      0
+Launceston        445         912     1041      1637      2973
+Hobart            597         1055    1161      1782      3018
+Canberra          473         240     968       935       3106
+'Alice Springs'   1888        2029    1326      1965      1995
+Darwin            3140        3145    2609      2847      2647
+Albury            259         462     765       1113      2895
+Cairns            2317        1957    2120      1389      3444
+Euroa             164         714     748       1516      3423
+Wellington        2578        2228    3226      2506      5272
+Yallourn          143         874     865       1785      3556

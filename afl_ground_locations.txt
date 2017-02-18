@@ -1,0 +1,47 @@
+# Ground locations
+
+                        location
+'Adelaide Oval'         Adelaide
+'Albury'	              Albury
+'Arden St'	            Melbourne
+'Bellerive Oval'	      Hobart
+'Blacktown'	            Sydney
+'Brisbane Exhibition'	  Brisbane
+'Bruce Stadium'	        Canberra
+'Brunswick St'	        Melbourne
+'Carrara'	              Brisbane
+"Cazaly's Stadium"	    Cairns
+'Coburg Oval'	          Melbourne
+'Corio Oval'	          Melbourne
+'Docklands'	            Melbourne
+'East Melbourne'	      Melbourne
+'Euroa'	                Euroa
+'Football Park'	        Adelaide
+'Gabba'	                Brisbane
+'Glenferrie Oval'	      Melbourne
+'Junction Oval'	        Melbourne
+'Kardinia Park'	        Melbourne
+'Lake Oval'	            Melbourne
+'M.C.G.'	              Melbourne
+'Manuka Oval'	          Canberra
+'Marrara Oval'	        Darwin
+'Moorabbin Oval'	      Melbourne
+'North Hobart'	        Hobart
+'Olympic Park'	        Melbourne
+'Princes Park'	        Melbourne
+'Punt Rd'	              Melbourne
+'S.C.G.'	              Sydney
+'Stadium Australia'	    Sydney
+'Subiaco'	              Perth
+'Sydney Showground'	    Sydney
+'Toorak Park'	          Melbourne
+'Traeger Park'	        'Alice Springs'
+'Victoria Park'	        Melbourne
+'W.A.C.A.'	            Perth
+'Waverley Park'	        Melbourne
+'Wellington'	          Wellington
+'Western Oval'	        Melbourne
+'Windy Hill'	          Melbourne
+'Yallourn'	            Yallourn
+'Yarraville Oval'	      Melbourne
+'York Park'	            Launceston

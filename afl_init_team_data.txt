@@ -1,0 +1,24 @@
+# Initial team data frame / table
+
+                          rating  location  season.start  season.end
+adelaide                  1500    Adelaide  1991          9999
+brisbane.bears            1500    Brisbane  1987          1996
+brisbane.lions            1500    Brisbane  1997          9999
+carlton                   1500    Melbourne 1897          9999
+collingwood               1500    Melbourne 1897          9999
+essendon                  1500    Melbourne 1897          9999
+fitzroy                   1500    Melbourne 1897          1996
+fremantle                 1500    Perth     1995          9999
+geelong                   1500    Melbourne 1897          9999
+gold.coast                1500    Brisbane  2011          9999
+greater.western.sydney    1500    Sydney    2012          9999
+hawthorn                  1500    Melbourne 1925          9999
+melbourne                 1500    Melbourne 1897          9999
+north.melbourne           1500    Melbourne 1925          9999
+port.adelaide             1500    Adelaide  1997          9999
+richmond                  1500    Melbourne 1908          9999
+st.kilda                  1500    Melbourne 1897          9999
+sydney                    1500    Melbourne 1897          9999
+university                1500    Melbourne 1908          1914
+west.coast.eagles         1500    Perth     1987          9999
+western.bulldogs          1500    Melbourne 1925          9999
