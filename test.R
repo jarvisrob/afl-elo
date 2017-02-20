@@ -1,10 +1,10 @@
 # Set the working dir
-setwd("C:/Users/jarvi/Documents/R/AFL/Elo")
+setwd("C:/Proj/afl-elo")
 
 # Source
-source('~/R/AFL/Elo/afltables_all_games_prep.R')
-source('~/R/AFL/Elo/afl_elo_init.R')
-source('~/R/AFL/Elo/afl_elo.R')
+source('afltables_all_games_prep.R')
+source('afl_elo_init.R')
+source('afl_elo.R')
 
 # Init
 all.games <- GetAllGames(do.download = F)
@@ -19,11 +19,11 @@ travel.distance <- InitTravelDistance()
 # Run Elo
 tic()
 elo.result <- RunElo(all.games, team.dictionary, team.data, ground.data, travel.distance, rating.time.series, all.games.elo, rating.mean = 1500, 
-                        param.spread = 400,
-                        param.margin = 0.01129223, 
-                        param.coeff.rating.update = 66.70423, param.regress.rating = 0.1865318, 
-                        param.coeff.ground.update = 25.58827, param.regress.ground = 0.1051385, 
-                        param.coeff.travel = 13.60048, param.rating.expansion.init = 1301.614)
+                     param.spread = 400,
+                     param.margin = 0.01129223, 
+                     param.coeff.rating.update = 66.70423, param.regress.rating = 0.1865318, 
+                     param.coeff.ground.update = 25.58827, param.regress.ground = 0.1051385, 
+                     param.coeff.travel = 13.60048, param.rating.expansion.init = 1301.614)
 toc()
 team.data.run <- elo.result[[1]]
 rating.time.series.run <- elo.result[[2]]
