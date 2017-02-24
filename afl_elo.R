@@ -41,7 +41,7 @@ RegressRating <- function(rating, rating.mean, param.regress) {
 }
 
 
-RunElo <- function(all.games, team.dictionary, team.data, ground.data, travel.distance, rating.time.series, all.games.elo, rating.mean,
+RunElo <- function(all.games, team.dictionary, team.data, ground.location, ground.panel.record, travel.distance, rating.time.series, all.games.elo, rating.mean,
                    param.spread, param.margin, 
                    param.coeff.rating.update, param.regress.rating, 
                    param.coeff.ground.update, param.regress.ground, param.coeff.travel,
@@ -84,11 +84,8 @@ RunElo <- function(all.games, team.dictionary, team.data, ground.data, travel.di
         if (sum(is.regress) > 0) {
           team.data$rating[is.regress] <- RegressRating(team.data$rating[is.regress], rating.mean, param.regress.rating)
           # regress ground rating for each active team
-          #print(row.names(ground.data))
-          ground.data.col.idx <- c(F, !logical(ncol(ground.data)-1)) & c(F, is.regress)  # Making first col index FALSE to avoid grouond locations col (1st col)
-          #print(rownames(ground.data[, ground.data.col.idx]))
-          #print(ground.data[, ground.data.col.idx])
-          ground.data[, ground.data.col.idx] <- RegressRating(ground.data[, ground.data.col.idx], 0, param.regress.ground)
+          #ground.data.col.idx <- c(F, !logical(ncol(ground.data)-1)) & c(F, is.regress)  # Making first col index FALSE to avoid grouond locations col (1st col)
+          #ground.data[, ground.data.col.idx] <- RegressRating(ground.data[, ground.data.col.idx], 0, param.regress.ground)
         }
         
         
@@ -112,23 +109,14 @@ RunElo <- function(all.games, team.dictionary, team.data, ground.data, travel.di
     }
     
     
-    
-    #print(game.idx)
     team.home <- team.dictionary[[all.games[game.idx, 'team.home']]]
-    #print(team.home)
     team.away <- team.dictionary[[all.games[game.idx, 'team.away']]]
-    #print(team.away)
     score.points.home <- all.games[game.idx, 'score.points.home']
-    #print(score.points.home)
     score.points.away <- all.games[game.idx, 'score.points.away']
-    #print(score.points.away)
     ground <- all.games[game.idx, 'ground']
-    #print(ground)
     
     rating.home <- team.data[team.home, 'rating']
-    #print(rating.home)
     rating.away <- team.data[team.away, 'rating']
-    #print(rating.away)
     
     rating.ground.adj.home <- CalculateGroundAdj(team.home, ground, ground.data)
     rating.ground.adj.away <- CalculateGroundAdj(team.away, ground, ground.data)
@@ -143,6 +131,30 @@ RunElo <- function(all.games, team.dictionary, team.data, ground.data, travel.di
     result.exp.home <- CalculateResultExp(delta.ratings, param.spread)
     result.exp.away <- 1 - result.exp.home
     margin.exp.home <- CalculateMarginExp(delta.ratings, param.spread, param.margin)
+
+
+
+    idx.gpr.team.home <- (ground.panel.record$team == team.home) &
+                         (ground.panel.record$ground == ground) &
+                         (ground.panel.record$season == season.current)
+    idx.gpr.team.away <- (ground.panel.record$team == team.away) &
+                         (ground.panel.record$ground == ground) &
+                         (ground.panel.record$season == season.current)
+    ground.panel.record[idx.gpr.team.home, "played"] <- ground.panel.record[idx.gpr.team.home, "played"] + 1
+    ground.panel.record[idx.gpr.team.away, "played"] <- ground.panel.record[idx.gpr.team.away, "played"] + 1
+    if (score.points.home > score.points.away) {
+      ground.panel.record[idx.gpr.team.home, "wins"] <- ground.panel.record[idx.gpr.team.home, "wins"] + 1
+      ground.panel.record[idx.gpr.team.away, "losses"] <- ground.panel.record[idx.gpr.team.away, "losses"] + 1
+    } else if (score.points.home < score.points.away) {
+      ground.panel.record[idx.gpr.team.home, "losses"] <- ground.panel.record[idx.gpr.team.home, "losses"] + 1
+      ground.panel.record[idx.gpr.team.away, "wins"] <- ground.panel.record[idx.gpr.team.away, "wins"] + 1
+    } else {
+      ground.panel.record[idx.gpr.team.home, "draws"] <- ground.panel.record[idx.gpr.team.home, "draws"] + 1
+      ground.panel.record[idx.gpr.team.away, "draws"] <- ground.panel.record[idx.gpr.team.away, "draws"] + 1
+    }
+    
+    
+    
     
     margin.act.home <- score.points.home - score.points.away
     result.act.home <- CalculateResultAct(margin.act.home, param.margin)
@@ -157,11 +169,11 @@ RunElo <- function(all.games, team.dictionary, team.data, ground.data, travel.di
     rating.time.series[season.round.current, team.home] <- rating.home.new
     rating.time.series[season.round.current, team.away] <- rating.away.new
     
-    rating.ground.adj.home.new <- CalculateRatingNew(rating.ground.adj.home, result.exp.home, result.act.home, param.coeff.ground.update)
-    rating.ground.adj.away.new <- CalculateRatingNew(rating.ground.adj.away, result.exp.away, result.act.away, param.coeff.ground.update)
+    #rating.ground.adj.home.new <- CalculateRatingNew(rating.ground.adj.home, result.exp.home, result.act.home, param.coeff.ground.update)
+    #rating.ground.adj.away.new <- CalculateRatingNew(rating.ground.adj.away, result.exp.away, result.act.away, param.coeff.ground.update)
     
-    ground.data[ground, team.home] <- rating.ground.adj.home.new
-    ground.data[ground, team.away] <- rating.ground.adj.away.new
+    #ground.data[ground, team.home] <- rating.ground.adj.home.new
+    #ground.data[ground, team.away] <- rating.ground.adj.away.new
     
     # Add all Elo data for this game to the all.games.elo data frame for later game-by-game analysis
     # all.games.elo[game.idx, "team.home"]
@@ -192,7 +204,7 @@ RunElo <- function(all.games, team.dictionary, team.data, ground.data, travel.di
   
   team.data$is.active <- is.active
   
-  elo.result <- list(team.data, rating.time.series, ground.data, all.games.elo, 
+  elo.result <- list(team.data, rating.time.series, ground.panel.record, all.games.elo, 
                      margin.cumulative.abs.error, result.cumulative.sq.error)
   elo.result
 }
