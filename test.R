@@ -1,5 +1,5 @@
 # Set the working dir
-setwd("C:/Proj/afl-elo")
+setwd("C:/Lab/afl-elo")
 
 # Source
 source('afltables_all_games_prep.R')

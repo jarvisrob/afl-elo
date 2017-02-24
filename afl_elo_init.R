@@ -74,6 +74,32 @@ InitGroundData <- function(all.games, team.data) {
 }
 
 
+InitGroundPanelRecord <- function(all.games, team.dictionary) {
+  team.home.half <- unique(all.games[c("season", "team.home", "ground")])
+  colnames(team.home.half) <- c("season", "team.name", "ground")
+  team.away.half <- unique(all.games[c("season", "team.away", "ground")])
+  colnames(team.away.half) <- c("season", "team.name", "ground")
+  unique.combos <- unique(rbind.data.frame(team.home.half, team.away.half))
+  unique.combos$team <- unlist(team.dictionary[unique.combos$team.name])
+  unique.combos$team.name <- NULL
+  unique.combos <- unique.combos[c("team", "ground", "season")]
+  n.unique.combos <- nrow(unique.combos)
+
+  ground.panel <- unique.combos[order(unique.combos$team, unique.combos$ground,
+                                      unique.combos$season),]
+
+  ground.panel.record <- ground.panel
+  ground.panel.record$played <- rep(0, n.unique.combos)
+  ground.panel.record$wins <- rep(0, n.unique.combos)
+  ground.panel.record$losses <- rep(0, n.unique.combos)
+  ground.panel.record$draws <- rep(0, n.unique.combos)
+
+  rownames(ground.panel.record) <- 1:n.unique.combos
+
+  ground.panel.record
+}
+
+
 InitTravelDistance <- function() {
   travel.distance <- read.table('afl_travel_distances.txt', header = T, sep = '', skip = 7, strip.white = T, as.is = T)
   travel.distance

@@ -22,6 +22,7 @@ GetAllGames <- function(file.url = 'http://afltables.com/afl/stats/biglists/bg3.
   all.games$ground <- trimws(all.games$ground)
   
   all.games$date <- as.Date(all.games$date, format = '%d-%b-%Y')
+  all.games$season <- as.integer(format(all.games$date, "%Y"))
   
   #all.games$round <- factor(all.games$round)
   
