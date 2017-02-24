@@ -17,15 +17,18 @@ ground.location <- InitGroundLocation()
 ground.panel.record <- InitGroundPanelRecord(all.games, team.dictionary)
 travel.distance <- InitTravelDistance()
 
-
 # Run Elo
 tic()
 elo.result <- RunElo(all.games, team.dictionary, team.data, ground.location, ground.panel.record, travel.distance, rating.time.series, all.games.elo, rating.mean = 1500, 
                      param.spread = 400,
                      param.margin = 0.01129223, 
                      param.coeff.rating.update = 66.70423, param.regress.rating = 0.1865318, 
-                     param.coeff.ground.update = 25.58827, param.regress.ground = 0.1051385, 
-                     param.coeff.travel = 13.60048, param.rating.expansion.init = 1301.614)
+                     param.time.window = 3, param.coeff.wins = 5, param.coeff.other = 2,
+                     param.coeff.travel = 13.60048,
+                     param.rating.expansion.init = 1301.614)
+
+#param.coeff.ground.update = 25.58827, param.regress.ground = 0.1051385,
+
 toc()
 team.data.run <- elo.result[[1]]
 rating.time.series.run <- elo.result[[2]]

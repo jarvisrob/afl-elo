@@ -1,13 +1,30 @@
 
-CalculateGroundAdj <- function(team, ground, ground.data) {
-  ground.adj <- ground.data[ground, team]
+CalculateGroundAdj <- function(team, ground, season.current, ground.panel.record,
+                               param.time.window, param.coeff.wins, param.coeff.other) {
+  #print(head(ground.panel.record))
+  #print(season.current)
+  #print(param.time.window)
+  idx <- (ground.panel.record$team == team) &
+         (ground.panel.record$ground == ground) &
+         (ground.panel.record$season >= season.current - param.time.window) &
+         (ground.panel.record$season <= season.current)
+  #print(ground.panel.record[idx, ])
+  n.wins <- sum(ground.panel.record[idx, "wins"])
+  #print(n.wins)
+  n.other <- sum(ground.panel.record[idx, "losses"],
+                 ground.panel.record[idx, "draws"])
+  #print(n.other)
+  
+  ground.adj <- (param.coeff.wins * n.wins) + (param.coeff.other * n.other)
+  #print(ground.adj)
+
   ground.adj
 }
 
-CalculateTravelAdj <- function(team, ground, team.data, ground.data, travel.distance, param.coeff.travel) {
+CalculateTravelAdj <- function(team, ground, team.data, ground.location, travel.distance, param.coeff.travel) {
   team.location <- team.data[team, 'location']
-  ground.location <- ground.data[ground, 'location']
-  distance <- travel.distance[ground.location, team.location]
+  #ground.location <- ground.data[ground, 'location']
+  distance <- travel.distance[ground.location[ground, ], team.location]
   
   travel.adj <- -param.coeff.travel * log10(distance + 1)
   
@@ -44,8 +61,11 @@ RegressRating <- function(rating, rating.mean, param.regress) {
 RunElo <- function(all.games, team.dictionary, team.data, ground.location, ground.panel.record, travel.distance, rating.time.series, all.games.elo, rating.mean,
                    param.spread, param.margin, 
                    param.coeff.rating.update, param.regress.rating, 
-                   param.coeff.ground.update, param.regress.ground, param.coeff.travel,
+                   param.time.window, param.coeff.wins, param.coeff.other,
+                   param.coeff.travel,
                    param.rating.expansion.init) {
+  
+  #print(head(ground.panel.record))
   
   # Initialise ratings
   is.founding.team <- (team.data$season.start <= 1897)
@@ -117,12 +137,14 @@ RunElo <- function(all.games, team.dictionary, team.data, ground.location, groun
     
     rating.home <- team.data[team.home, 'rating']
     rating.away <- team.data[team.away, 'rating']
+      
+    rating.ground.adj.home <- CalculateGroundAdj(team.home, ground, season.current, ground.panel.record,
+                                                   param.time.window, param.coeff.wins, param.coeff.other)
+    rating.ground.adj.away <- CalculateGroundAdj(team.away, ground, season.current, ground.panel.record,
+                                                   param.time.window, param.coeff.wins, param.coeff.other)
     
-    rating.ground.adj.home <- CalculateGroundAdj(team.home, ground, ground.data)
-    rating.ground.adj.away <- CalculateGroundAdj(team.away, ground, ground.data)
-    
-    rating.travel.adj.home <- CalculateTravelAdj(team.home, ground, team.data, ground.data, travel.distance, param.coeff.travel)
-    rating.travel.adj.away <- CalculateTravelAdj(team.away, ground, team.data, ground.data, travel.distance, param.coeff.travel)
+    rating.travel.adj.home <- CalculateTravelAdj(team.home, ground, team.data, ground.location, travel.distance, param.coeff.travel)
+    rating.travel.adj.away <- CalculateTravelAdj(team.away, ground, team.data, ground.location, travel.distance, param.coeff.travel)
     
     rating.home.adj <- rating.home + rating.ground.adj.home + rating.travel.adj.home
     rating.away.adj <- rating.away + rating.ground.adj.away + rating.travel.adj.away
@@ -152,7 +174,6 @@ RunElo <- function(all.games, team.dictionary, team.data, ground.location, groun
       ground.panel.record[idx.gpr.team.home, "draws"] <- ground.panel.record[idx.gpr.team.home, "draws"] + 1
       ground.panel.record[idx.gpr.team.away, "draws"] <- ground.panel.record[idx.gpr.team.away, "draws"] + 1
     }
-    
     
     
     
