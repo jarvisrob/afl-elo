@@ -53,13 +53,16 @@ CalculateRatingNew <- function(rating, result.exp, result.act, param.coeff.updat
 }
 
 
-RegressRating <- function(rating, rating.mean, param.regress) {
-  rating.new <- ((1 - param.regress) * rating) + (param.regress * rating.mean)
+RegressRating <- function(rating, param.rating.mean, param.regress) {
+  rating.new <- ((1 - param.regress) * rating) + (param.regress * param.rating.mean)
 }
 
 
-RunElo <- function(all.games, team.dictionary, team.data, ground.location, ground.panel.record, travel.distance, rating.time.series, all.games.elo, rating.mean,
-                   param.spread, param.margin, 
+RunElo <- function(all.games, team.dictionary, team.data,
+                   ground.location, ground.panel.record, travel.distance,
+                   rating.time.series, all.games.elo,
+                   param.rating.mean, param.spread,
+                   param.margin,
                    param.coeff.rating.update, param.regress.rating, 
                    param.time.window, param.coeff.wins, param.coeff.other,
                    param.coeff.travel,
@@ -68,7 +71,7 @@ RunElo <- function(all.games, team.dictionary, team.data, ground.location, groun
   
   # Initialise ratings
   yes.founding.team <- (team.data$season.start <= 1897)
-  team.data$rating[yes.founding.team] <- rating.mean
+  team.data$rating[yes.founding.team] <- param.rating.mean
   team.data$rating[!yes.founding.team] <- param.rating.expansion.init
   
   # Initialise cumulative sum abs error on margin
@@ -95,7 +98,7 @@ RunElo <- function(all.games, team.dictionary, team.data, ground.location, groun
       # Ratings regress to mean for teams that played the previous season
       yes.regress <- (team.data$season.start < season.current) & (team.data$season.end >= season.current)
       if (any(yes.regress)) {
-        team.data$rating[yes.regress] <- RegressRating(team.data$rating[yes.regress], rating.mean, param.regress.rating)
+        team.data$rating[yes.regress] <- RegressRating(team.data$rating[yes.regress], param.rating.mean, param.regress.rating)
       }
       
       # Determine active teams and record their rating at season start (after regression)
@@ -204,7 +207,8 @@ RunElo <- function(all.games, team.dictionary, team.data, ground.location, groun
   team.data$yes.active <- yes.active
 
   # Collate and return the results
-  elo.result <- list(team.data, rating.time.series, ground.panel.record, all.games.elo, 
+  elo.result <- list(team.data, rating.time.series,
+                     ground.panel.record, all.games.elo,
                      margin.cumulative.abs.error, result.cumulative.sq.error)
   elo.result
 }

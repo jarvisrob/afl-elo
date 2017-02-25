@@ -19,8 +19,10 @@ travel.distance <- InitTravelDistance()
 
 # Run Elo
 tic()
-elo.result <- RunElo(all.games, team.dictionary, team.data, ground.location, ground.panel.record, travel.distance, rating.time.series, all.games.elo, rating.mean = 1500, 
-                     param.spread = 400,
+elo.result <- RunElo(all.games, team.dictionary, team.data,
+                     ground.location, ground.panel.record, travel.distance,
+                     rating.time.series, all.games.elo,
+                     param.rating.mean = 1500, param.spread = 400,
                      param.margin = 0.01129223, 
                      param.coeff.rating.update = 66.70423, param.regress.rating = 0.1865318, 
                      param.time.window = 3, param.coeff.wins = 5, param.coeff.other = 2,
