@@ -120,8 +120,7 @@ InitAllGamesElo <- function(all.games) {
           "result.exp.home", "result.exp.away", "margin.exp.home",
           "result.act.home", "result.act.away", "margin.act.home",
           "result.error.home", "result.error.away", "margin.error.home",
-          "rating.delta.update.home", "rating.home.new", "rating.away.new",
-          "rating.ground.delta.update.home", "rating.ground.adj.home.new", "rating.ground.adj.away.new")
+          "rating.delta.update.home", "rating.home.new", "rating.away.new")
   all.games.elo <- data.frame(matrix(NA, nrow = nrow(all.games), ncol = length(cn)))
   colnames(all.games.elo) <- cn
   

@@ -209,15 +209,16 @@ RunElo <- function(all.games, team.dictionary, team.data, ground.location, groun
     # all.games.elo[game.idx, "rating.ground.adj.away.before"]
     # all.games.elo[game.idx, "rating.travel.adj.away.before"]
     # all.games.elo[game.idx, "rating.away.adj.before"]
-    # all.games.elo[game.idx, 1:2] <- c(team.home, team.away)
-    # all.games.elo[game.idx, 3:ncol(all.games.elo)] <- c(rating.home, rating.ground.adj.home, rating.travel.adj.home, rating.home.adj,
-    #                                                     rating.away, rating.ground.adj.away, rating.travel.adj.away, rating.away.adj,
-    #                                                     delta.ratings,
-    #                                                     result.exp.home, result.exp.away, margin.exp.home,
-    #                                                     result.act.home, result.act.away, margin.act.home,
-    #                                                     result.act.home - result.exp.home, result.act.away - result.exp.away, margin.act.home - margin.exp.home,
-    #                                                     rating.home.new - rating.home, rating.home.new, rating.away.new,
-    #                                                     rating.ground.adj.home.new - rating.ground.adj.home, rating.ground.adj.home.new, rating.ground.adj.away.new)
+
+
+     all.games.elo[game.idx, 1:2] <- c(team.home, team.away)
+     all.games.elo[game.idx, 3:ncol(all.games.elo)] <- c(rating.home, rating.ground.adj.home, rating.travel.adj.home, rating.home.adj,
+                                                         rating.away, rating.ground.adj.away, rating.travel.adj.away, rating.away.adj,
+                                                         delta.ratings,
+                                                         result.exp.home, result.exp.away, margin.exp.home,
+                                                         result.act.home, result.act.away, margin.act.home,
+                                                         result.act.home - result.exp.home, result.act.away - result.exp.away, margin.act.home - margin.exp.home,
+                                                         rating.home.new - rating.home, rating.home.new, rating.away.new)
     
     margin.cumulative.abs.error <- margin.cumulative.abs.error + abs(margin.act.home - margin.exp.home)
     result.cumulative.sq.error <- result.cumulative.sq.error + (result.exp.home - result.act.home)^2
