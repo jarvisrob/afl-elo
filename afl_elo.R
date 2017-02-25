@@ -63,7 +63,8 @@ RunElo <- function(all.games, team.dictionary, team.data, ground.location, groun
                    param.coeff.rating.update, param.regress.rating, 
                    param.time.window, param.coeff.wins, param.coeff.other,
                    param.coeff.travel,
-                   param.rating.expansion.init) {
+                   param.rating.expansion.init,
+                   do.store.detail = FALSE) {
   
   # Initialise ratings
   yes.founding.team <- (team.data$season.start <= 1897)
@@ -127,9 +128,9 @@ RunElo <- function(all.games, team.dictionary, team.data, ground.location, groun
 
     # Determine ground adjustments
     rating.ground.adj.home <- CalculateGroundAdj(team.home, ground, season.current, ground.panel.record,
-                                                   param.time.window, param.coeff.wins, param.coeff.other)
+                                                 param.time.window, param.coeff.wins, param.coeff.other)
     rating.ground.adj.away <- CalculateGroundAdj(team.away, ground, season.current, ground.panel.record,
-                                                   param.time.window, param.coeff.wins, param.coeff.other)
+                                                 param.time.window, param.coeff.wins, param.coeff.other)
 
     # Determine travel adjustments
     rating.travel.adj.home <- CalculateTravelAdj(team.home, ground, team.data, ground.location, travel.distance, param.coeff.travel)
@@ -180,36 +181,18 @@ RunElo <- function(all.games, team.dictionary, team.data, ground.location, groun
       ground.panel.record[idx.gpr.team.home, "draws"] <- ground.panel.record[idx.gpr.team.home, "draws"] + 1
       ground.panel.record[idx.gpr.team.away, "draws"] <- ground.panel.record[idx.gpr.team.away, "draws"] + 1
     }
-    
-    #rating.ground.adj.home.new <- CalculateRatingNew(rating.ground.adj.home, result.exp.home, result.act.home, param.coeff.ground.update)
-    #rating.ground.adj.away.new <- CalculateRatingNew(rating.ground.adj.away, result.exp.away, result.act.away, param.coeff.ground.update)
-    
-    #ground.data[ground, team.home] <- rating.ground.adj.home.new
-    #ground.data[ground, team.away] <- rating.ground.adj.away.new
-    
-    # Add all Elo data for this game to the all.games.elo data frame for later game-by-game analysis
-    # all.games.elo[game.idx, "team.home"]
-    # all.games.elo[game.idx, "team.away"]
-    # 
-    # all.games.elo[game.idx, "rating.home.before"]
-    # all.games.elo[game.idx, "rating.ground.adj.home.before"]
-    # all.games.elo[game.idx, "rating.travel.adj.home.before"]
-    # all.games.elo[game.idx, "rating.home.adj.before"]
-    # 
-    # all.games.elo[game.idx, "rating.away.before"]
-    # all.games.elo[game.idx, "rating.ground.adj.away.before"]
-    # all.games.elo[game.idx, "rating.travel.adj.away.before"]
-    # all.games.elo[game.idx, "rating.away.adj.before"]
 
-    # Store the details of the Elo variables for this game for post-analysis
-    all.games.elo[game.idx, 1:2] <- c(team.home, team.away)
-    all.games.elo[game.idx, 3:ncol(all.games.elo)] <- c(rating.home, rating.ground.adj.home, rating.travel.adj.home, rating.home.adj,
-                                                        rating.away, rating.ground.adj.away, rating.travel.adj.away, rating.away.adj,
-                                                        delta.ratings,
-                                                        result.exp.home, result.exp.away, margin.exp.home,
-                                                        result.act.home, result.act.away, margin.act.home,
-                                                        result.act.home - result.exp.home, result.act.away - result.exp.away, margin.act.home - margin.exp.home,
-                                                        rating.home.new - rating.home, rating.home.new, rating.away.new)
+    # Option to store the details of Elo variables for this game for post-analysis
+    if (do.store.detail) {
+      all.games.elo[game.idx, 1:2] <- c(team.home, team.away)
+      all.games.elo[game.idx, 3:ncol(all.games.elo)] <- c(rating.home, rating.ground.adj.home, rating.travel.adj.home, rating.home.adj,
+                                                          rating.away, rating.ground.adj.away, rating.travel.adj.away, rating.away.adj,
+                                                          delta.ratings,
+                                                          result.exp.home, result.exp.away, margin.exp.home,
+                                                          result.act.home, result.act.away, margin.act.home,
+                                                          result.act.home - result.exp.home, result.act.away - result.exp.away, margin.act.home - margin.exp.home,
+                                                          rating.home.new - rating.home, rating.home.new, rating.away.new)
+    }
 
     # Update the cumulative error tracking variables
     margin.cumulative.abs.error <- margin.cumulative.abs.error + abs(margin.act.home - margin.exp.home)
