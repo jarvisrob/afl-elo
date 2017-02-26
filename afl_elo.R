@@ -74,11 +74,11 @@ RunElo <- function(all.games, team.dictionary, team.data,
   team.data$rating[yes.founding.team] <- param.rating.mean
   team.data$rating[!yes.founding.team] <- param.rating.expansion.init
   
-  # Initialise cumulative sum abs error on margin
+  # Initialise error tracking variables
   margin.cumulative.abs.error <- 0
-  
-  # Initialise cumulative sum squared error on result, for Brier score calc
   result.cumulative.sq.error <- 0
+  brier.cumulative.error <- 0
+  log.score.cumulative.error <- 0
   
   # Initialise season tracking variable
   season.current <- 1897
@@ -114,6 +114,8 @@ RunElo <- function(all.games, team.dictionary, team.data,
       if (season.current == 1990) {
         margin.cumulative.abs.error <- 0
         result.cumulative.sq.error <- 0
+        brier.cumulative.error <- 0
+        log.score.cumulative.error <- 0
       }
     
     }
@@ -164,8 +166,8 @@ RunElo <- function(all.games, team.dictionary, team.data,
     rating.time.series[season.round.current, team.home] <- rating.home.new
     rating.time.series[season.round.current, team.away] <- rating.away.new
 
-    # Update the ground panel records of each team's win/loss/draw at each ground
-    # for each season
+    # Determine outcome (win/loss/draw) for the home team, and also update the
+    # ground panel records with the win/loss/draw outcome
     idx.gpr.team.home <- (ground.panel.record$team == team.home) &
                          (ground.panel.record$ground == ground) &
                          (ground.panel.record$season == season.current)
@@ -175,12 +177,15 @@ RunElo <- function(all.games, team.dictionary, team.data,
     ground.panel.record[idx.gpr.team.home, "played"] <- ground.panel.record[idx.gpr.team.home, "played"] + 1
     ground.panel.record[idx.gpr.team.away, "played"] <- ground.panel.record[idx.gpr.team.away, "played"] + 1
     if (score.points.home > score.points.away) {
+      outcome.home <- 1
       ground.panel.record[idx.gpr.team.home, "wins"] <- ground.panel.record[idx.gpr.team.home, "wins"] + 1
       ground.panel.record[idx.gpr.team.away, "losses"] <- ground.panel.record[idx.gpr.team.away, "losses"] + 1
     } else if (score.points.home < score.points.away) {
+      outcome.home <- 0
       ground.panel.record[idx.gpr.team.home, "losses"] <- ground.panel.record[idx.gpr.team.home, "losses"] + 1
       ground.panel.record[idx.gpr.team.away, "wins"] <- ground.panel.record[idx.gpr.team.away, "wins"] + 1
     } else {
+      outcome.home <- 0.5
       ground.panel.record[idx.gpr.team.home, "draws"] <- ground.panel.record[idx.gpr.team.home, "draws"] + 1
       ground.panel.record[idx.gpr.team.away, "draws"] <- ground.panel.record[idx.gpr.team.away, "draws"] + 1
     }
@@ -192,6 +197,7 @@ RunElo <- function(all.games, team.dictionary, team.data,
                                                           rating.away, rating.ground.adj.away, rating.travel.adj.away, rating.away.adj,
                                                           delta.ratings,
                                                           result.exp.home, result.exp.away, margin.exp.home,
+                                                          outcome.home,
                                                           result.act.home, result.act.away, margin.act.home,
                                                           result.act.home - result.exp.home, result.act.away - result.exp.away, margin.act.home - margin.exp.home,
                                                           rating.home.new - rating.home, rating.home.new, rating.away.new)
@@ -199,7 +205,9 @@ RunElo <- function(all.games, team.dictionary, team.data,
 
     # Update the cumulative error tracking variables
     margin.cumulative.abs.error <- margin.cumulative.abs.error + abs(margin.act.home - margin.exp.home)
-    result.cumulative.sq.error <- result.cumulative.sq.error + (result.exp.home - result.act.home)^2
+    result.cumulative.sq.error <- result.cumulative.sq.error + (result.exp.home - result.act.home) ^ 2
+    brier.cumulative.error <- brier.cumulative.error + (result.exp.home - outcome.home) ^ 2
+    log.score.cumulative.error <- log.score.cumulative.error + ((outcome.home * log(result.exp.home)) + ((1 - outcome.home) * log(1 - result.exp.home)))
   
   }
 
@@ -209,7 +217,8 @@ RunElo <- function(all.games, team.dictionary, team.data,
   # Collate and return the results
   elo.result <- list(team.data, rating.time.series,
                      ground.panel.record, all.games.elo,
-                     margin.cumulative.abs.error, result.cumulative.sq.error)
+                     margin.cumulative.abs.error, result.cumulative.sq.error,
+                     brier.cumulative.error, log.score.cumulative.error)
   elo.result
 }
 

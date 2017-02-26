@@ -118,6 +118,7 @@ InitAllGamesElo <- function(all.games) {
           "rating.away.before", "rating.ground.adj.away.before", "rating.travel.adj.away", "rating.away.adj.before",
           "delta.rating.before",
           "result.exp.home", "result.exp.away", "margin.exp.home",
+          "outcome.home",
           "result.act.home", "result.act.away", "margin.act.home",
           "result.error.home", "result.error.away", "margin.error.home",
           "rating.delta.update.home", "rating.home.new", "rating.away.new")

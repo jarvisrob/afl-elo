@@ -51,6 +51,9 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
 
   #margin.sum.abs.error <- elo.result[[5]]
   result.sum.sq.error <- elo.result[[6]]
+
+  #brier.cumulative.error <- elo.result[[7]]
+  #log.score.cumulative.error <- elo.result[[8]]
   
   #margin.mae <- margin.sum.abs.error / nrow(all.games)
   #print(margin.mae)
@@ -59,9 +62,12 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
   print(result.sum.sq.error)
   result.sum.sq.error
   
-  #brier.score <- result.sum.sq.error / nrow(all.games)
-  #print(brier.score)
-  #brier.score
+  #print(brier.cumulative.error)
+  #brier.cumulative.error
+
+  #print(log.score.cumulative.error)
+  #log.score.cumulative.error
+
 }
 
 

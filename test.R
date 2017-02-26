@@ -27,7 +27,8 @@ elo.result <- RunElo(all.games, team.dictionary, team.data,
                      param.coeff.rating.update = 66.70423, param.regress.rating = 0.1865318, 
                      param.time.window = 3, param.coeff.wins = 5, param.coeff.other = 2,
                      param.coeff.travel = 13.60048,
-                     param.rating.expansion.init = 1301.614)
+                     param.rating.expansion.init = 1301.614,
+                     do.store.detail = TRUE)
 
 #param.coeff.ground.update = 25.58827, param.regress.ground = 0.1051385,
 
@@ -38,3 +39,5 @@ ground.panel.record.run <- elo.result[[3]]
 all.games.elo.run <- elo.result[[4]]
 margin.sum.abs.error <- elo.result[[5]]
 result.sum.sq.error <- elo.result[[6]]
+brier.cumulative.error <- elo.result[[7]]
+log.score.cumulative.error <- elo.result[[8]]
