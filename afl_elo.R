@@ -1,29 +1,23 @@
 
 CalculateGroundAdj <- function(team, ground, season.current, ground.panel.record,
                                param.time.window, param.coeff.wins, param.coeff.other) {
-  #print(head(ground.panel.record))
-  #print(season.current)
-  #print(param.time.window)
   idx <- (ground.panel.record$team == team) &
          (ground.panel.record$ground == ground) &
          (ground.panel.record$season >= season.current - param.time.window) &
          (ground.panel.record$season <= season.current)
-  #print(ground.panel.record[idx, ])
+
   n.wins <- sum(ground.panel.record[idx, "wins"])
-  #print(n.wins)
   n.other <- sum(ground.panel.record[idx, "losses"],
                  ground.panel.record[idx, "draws"])
-  #print(n.other)
   
   ground.adj <- (param.coeff.wins * n.wins) + (param.coeff.other * n.other)
-  #print(ground.adj)
 
   ground.adj
 }
 
+
 CalculateTravelAdj <- function(team, ground, team.data, ground.location, travel.distance, param.coeff.travel) {
   team.location <- team.data[team, 'location']
-  #ground.location <- ground.data[ground, 'location']
   distance <- travel.distance[ground.location[ground, ], team.location]
   
   travel.adj <- -param.coeff.travel * log10(distance + 1)
@@ -32,9 +26,8 @@ CalculateTravelAdj <- function(team, ground, team.data, ground.location, travel.
 }
 
 
-
 CalculateResultExp <- function(delta.ratings, param.spread) {
-  result.exp <- 1 / (10^(-delta.ratings/400) + 1)
+  result.exp <- 1 / (10 ^ (-delta.ratings / param.spread) + 1)
 }
 
 
@@ -44,7 +37,7 @@ CalculateMarginExp <- function(delta.ratings, param.spread, param.margin) {
 
 
 CalculateResultAct <- function(margin.act, param.margin) {
-  result.act <- 1 / (10^(-param.margin * margin.act) + 1)
+  result.act <- 1 / (10 ^ (-param.margin * margin.act) + 1)
 }
 
 
@@ -190,6 +183,9 @@ RunElo <- function(all.games, team.dictionary, team.data,
       ground.panel.record[idx.gpr.team.away, "draws"] <- ground.panel.record[idx.gpr.team.away, "draws"] + 1
     }
 
+    brier.game <- (result.exp.home - outcome.home) ^ 2
+    log.score.game <- (outcome.home * log(result.exp.home)) + ((1 - outcome.home) * log(1 - result.exp.home))
+
     # Option to store the details of Elo variables for this game for post-analysis
     if (do.store.detail) {
       all.games.elo[game.idx, 1:2] <- c(team.home, team.away)
@@ -197,7 +193,7 @@ RunElo <- function(all.games, team.dictionary, team.data,
                                                           rating.away, rating.ground.adj.away, rating.travel.adj.away, rating.away.adj,
                                                           delta.ratings,
                                                           result.exp.home, result.exp.away, margin.exp.home,
-                                                          outcome.home,
+                                                          outcome.home, brier.game, log.score.game,
                                                           result.act.home, result.act.away, margin.act.home,
                                                           result.act.home - result.exp.home, result.act.away - result.exp.away, margin.act.home - margin.exp.home,
                                                           rating.home.new - rating.home, rating.home.new, rating.away.new)
@@ -206,8 +202,8 @@ RunElo <- function(all.games, team.dictionary, team.data,
     # Update the cumulative error tracking variables
     margin.cumulative.abs.error <- margin.cumulative.abs.error + abs(margin.act.home - margin.exp.home)
     result.cumulative.sq.error <- result.cumulative.sq.error + (result.exp.home - result.act.home) ^ 2
-    brier.cumulative.error <- brier.cumulative.error + (result.exp.home - outcome.home) ^ 2
-    log.score.cumulative.error <- log.score.cumulative.error + ((outcome.home * log(result.exp.home)) + ((1 - outcome.home) * log(1 - result.exp.home)))
+    brier.cumulative.error <- brier.cumulative.error + brier.game
+    log.score.cumulative.error <- log.score.cumulative.error + log.score.game
   
   }
 
@@ -221,6 +217,3 @@ RunElo <- function(all.games, team.dictionary, team.data,
                      brier.cumulative.error, log.score.cumulative.error)
   elo.result
 }
-
-
-
