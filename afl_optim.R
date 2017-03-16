@@ -16,6 +16,7 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
 
   param.rating.expansion.init <- tunable.params[8]
 
+  
   # Fixed parameters
   param.rating.mean <- fixed.params[1]
   param.spread <- fixed.params[2]
@@ -49,29 +50,33 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
   #ground.panel.record.run <- elo.result[[3]]
   #all.games.elo.run <- elo.result[[4]]
 
-  #margin.sum.abs.error <- elo.result[[5]]
+  margin.sum.abs.error <- elo.result[[5]]
   #result.sum.sq.error <- elo.result[[6]]
 
   brier.cumulative.error <- elo.result[[7]]
   #log.score.cumulative.error <- elo.result[[8]]
   
-  #margin.mae <- margin.sum.abs.error / nrow(all.games)
-  #print(margin.mae)
+  margin.mae <- margin.sum.abs.error / sum(all.games$season >= 1990)
+  print(margin.mae)
   #margin.mae
   
   #print(result.sum.sq.error)
   #result.sum.sq.error
   
   print(brier.cumulative.error)
-  brier.cumulative.error
+  #brier.cumulative.error
 
   #print(log.score.cumulative.error)
   #log.score.cumulative.error
+
+  output <- list(brier = brier.cumulative.error, margin.mae = margin.mae)
 
 }
 
 
 # Initial values
+tunable.params.type <- c("continuous", "continuous", "continuous", "discrete", "continuous", "continuous", "continuous", "continuous")
+
 tunable.params.init <- c(0.01,
                          50.0, 0.2,
                          3, 5.0, 2.0,
@@ -89,15 +94,33 @@ tunable.params.upper <- c(1,
                           1500.0)
 fixed <- c(1500.0, 400.0)
 
+f.lower <- c(0, 0)
+f.upper <- c(Inf, 30.0)
+
+fw.d <- c(0.001, 0.25, 0.001, 1, 0.25, 0.25, 0.25, 1.0)
+
 # Data inputs
 df.inputs <- list(all.games, team.dictionary, team.data,
                   ground.location, ground.panel.record, travel.distance,
                   rating.time.series, all.games.elo)
 
 # Optimisation call
+source("../stochoptim/harmony_search.R")
+
+
 tic()
-optim.result <- optim(par = tunable.params.init, OptimWrapperRunElo,
-                      fixed.params = fixed, data.inputs = df.inputs,
-                      method = "L-BFGS-B",
-                      lower = tunable.params.lower, upper = tunable.params.upper)
+harm.search.res <- HarmonySearch(OptimWrapperRunElo, fixed.params = fixed, data.inputs = df.inputs,
+                                 x.type = tunable.params.type, 
+                                 x.lower = tunable.params.lower, 
+                                 x.upper = tunable.params.upper, 
+                                 f.lower = f.lower,
+                                 f.upper = f.upper,
+                                 fw.d = fw.d,
+                                 hms = 3, hmcr = 0.9, par = 0.3,
+                                 itn.max = 1, minimize = TRUE)
+
+#optim.result <- optim(par = tunable.params.init, OptimWrapperRunElo,
+                      #fixed.params = fixed, data.inputs = df.inputs,
+                      #method = "L-BFGS-B",
+                      #lower = tunable.params.lower, upper = tunable.params.upper)
 toc()
