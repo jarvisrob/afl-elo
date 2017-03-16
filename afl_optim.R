@@ -87,17 +87,17 @@ tunable.params.lower <- c(0.000001,
                           0, 0.001, 0.001,
                           0.001,
                           800.0)
-tunable.params.upper <- c(1,
-                          250.0, 1,
-                          30, 250.0, 250.0,
-                          250.0,
+tunable.params.upper <- c(0.5,
+                          100.0, 0.5,
+                          26, 100.0, 100.0,
+                          100.0,
                           1500.0)
 fixed <- c(1500.0, 400.0)
 
 f.lower <- c(0, 0)
 f.upper <- c(Inf, 30.0)
 
-fw.d <- c(0.001, 0.25, 0.001, 1, 0.25, 0.25, 0.25, 1.0)
+fw.d <- c(0.0005, 0.1, 0.0005, 1, 0.001, 0.001, 0.001, 1.0)
 
 # Data inputs
 df.inputs <- list(all.games, team.dictionary, team.data,
