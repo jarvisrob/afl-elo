@@ -10,7 +10,7 @@ CalculateGroundAdj <- function(team, ground, season.current, ground.panel.record
   n.other <- sum(ground.panel.record[idx, "losses"],
                  ground.panel.record[idx, "draws"])
   
-  ground.adj <- (param.coeff.wins * n.wins) + (param.coeff.other * n.other)
+  ground.adj <- (param.coeff.wins * log10(n.wins + 1)) + (param.coeff.other * log10(n.other + 1))
 
   ground.adj
 }
@@ -103,8 +103,8 @@ RunElo <- function(all.games, team.dictionary, team.data,
         team.data['sydney', 'location'] <- 'Sydney'
       }
 
-      # Start calibration/optimisation on the AFL era
-      if (season.current == 1990) {
+      # Start calibration/optimisation for 1994 season
+      if (season.current == 1994) {
         margin.cumulative.abs.error <- 0
         result.cumulative.sq.error <- 0
         brier.cumulative.error <- 0

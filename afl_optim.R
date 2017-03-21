@@ -1,7 +1,10 @@
 # Optimisation
 
 OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
-  
+
+  print("Tunable params:")
+  print(tunable.params)
+
   # Tunable parameters
   param.margin <- tunable.params[1]
   
@@ -56,20 +59,27 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
   brier.cumulative.error <- elo.result[[7]]
   #log.score.cumulative.error <- elo.result[[8]]
   
-  margin.mae <- margin.sum.abs.error / sum(all.games$season >= 1990)
-  print(margin.mae)
+  margin.mae <- margin.sum.abs.error / sum(all.games$season >= 1994)
+  print(paste0("Margin MAE = ", as.character(margin.mae)))
   #margin.mae
   
   #print(result.sum.sq.error)
   #result.sum.sq.error
-  
-  print(brier.cumulative.error)
+
+  brier.score <- brier.cumulative.error / sum(all.games$season >= 1994)
+  print(paste0("Brier score = ", as.character(brier.score)))
   #brier.cumulative.error
+
+  #calib <- CheckCalibration(all.games.elo.run[all.games$season >= 1994, ], 0.02)
+  ##print(calib)
+  #ss.calib.error <- sum(calib$calib.error ^ 2, na.rm = TRUE)
+  #print(paste0("SS calib error = ", as.character(ss.calib.error)))
 
   #print(log.score.cumulative.error)
   #log.score.cumulative.error
 
-  output <- list(brier = brier.cumulative.error, margin.mae = margin.mae)
+  print("---")
+  output <- list(brier.score = brier.score, margin.mae = margin.mae)
 
 }
 
@@ -86,18 +96,18 @@ tunable.params.lower <- c(0.000001,
                           0.1, 0,
                           0, 0.001, 0.001,
                           0.001,
-                          800.0)
-tunable.params.upper <- c(0.5,
-                          100.0, 0.5,
-                          26, 100.0, 100.0,
-                          100.0,
+                          750.0)
+tunable.params.upper <- c(0.2,
+                          150, 0.5,
+                          10, 50.0, 50.0,
+                          150.0,
                           1500.0)
 fixed <- c(1500.0, 400.0)
 
 f.lower <- c(0, 0)
 f.upper <- c(Inf, 30.0)
 
-fw.d <- c(0.0005, 0.1, 0.0005, 1, 0.001, 0.001, 0.001, 1.0)
+fw.d <- c(0.0002, 0.15, 0.0005, 1, 0.0005, 0.0005, 0.0015, 1.0)
 
 # Data inputs
 df.inputs <- list(all.games, team.dictionary, team.data,
@@ -116,8 +126,9 @@ harm.search.res <- HarmonySearch(OptimWrapperRunElo, fixed.params = fixed, data.
                                  f.lower = f.lower,
                                  f.upper = f.upper,
                                  fw.d = fw.d,
-                                 hms = 3, hmcr = 0.9, par = 0.3,
-                                 itn.max = 1, minimize = TRUE)
+                                 hms = 30, hmcr = 0.9, par = 0.3,
+                                 itn.max = 700, minimize = TRUE,
+                                 hm.init = hm.prev)
 
 #optim.result <- optim(par = tunable.params.init, OptimWrapperRunElo,
                       #fixed.params = fixed, data.inputs = df.inputs,
