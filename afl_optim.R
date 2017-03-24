@@ -11,13 +11,12 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
   param.coeff.rating.update <- tunable.params[2]
   param.regress.rating <- tunable.params[3]
   
-  param.time.window <- tunable.params[4]
-  param.coeff.wins <- tunable.params[5]
-  param.coeff.other <- tunable.params[6]
+  param.coeff.ground.update <- tunable.params[4]
+  param.regress.ground <- tunable.params[5]
 
-  param.coeff.travel <- tunable.params[7]
+  param.coeff.travel <- tunable.params[6]
 
-  param.rating.expansion.init <- tunable.params[8]
+  param.rating.expansion.init <- tunable.params[7]
 
   
   # Fixed parameters
@@ -30,19 +29,19 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
   team.data <- data.inputs[[3]]
 
   ground.location <- data.inputs[[4]]
-  ground.panel.record <- data.inputs[[5]]
+  ground.data <- data.inputs[[5]]
   travel.distance <- data.inputs[[6]]
 
   rating.time.series <- data.inputs[[7]]
   all.games.elo <- data.inputs[[8]]
   
   elo.result <- RunElo(all.games, team.dictionary, team.data,
-                       ground.location, ground.panel.record, travel.distance,
+                       ground.location, ground.data, travel.distance,
                        rating.time.series, all.games.elo,
                        param.rating.mean, param.spread,
                        param.margin,
                        param.coeff.rating.update, param.regress.rating,
-                       param.time.window, param.coeff.wins, param.coeff.other,
+                       param.coeff.ground.update, param.regress.ground,
                        param.coeff.travel,
                        param.rating.expansion.init,
                        do.store.detail = FALSE)
@@ -85,21 +84,21 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
 
 
 # Initial values
-tunable.params.type <- c("continuous", "continuous", "continuous", "discrete", "continuous", "continuous", "continuous", "continuous")
+tunable.params.type <- c("continuous", "continuous", "continuous", "continuous", "continuous", "continuous", "continuous")
 
-tunable.params.init <- c(0.01,
-                         50.0, 0.2,
-                         3, 5.0, 2.0,
-                         15.0,
-                         1300.0)
+#tunable.params.init <- c(0.01,
+                         #50.0, 0.2,
+                         #3, 5.0, 2.0,
+                         #15.0,
+                         #1300.0)
 tunable.params.lower <- c(0.000001,
                           0.1, 0,
-                          0, 0.001, 0.001,
+                          0, 0,
                           0.001,
                           750.0)
 tunable.params.upper <- c(0.2,
-                          150, 0.5,
-                          10, 50.0, 50.0,
+                          150.0, 0.5,
+                          100.0, 1.0,
                           150.0,
                           1500.0)
 fixed <- c(1500.0, 400.0)
@@ -111,7 +110,7 @@ fw.d <- c(0.0002, 0.15, 0.0005, 1, 0.0005, 0.0005, 0.0015, 1.0)
 
 # Data inputs
 df.inputs <- list(all.games, team.dictionary, team.data,
-                  ground.location, ground.panel.record, travel.distance,
+                  ground.location, ground.data, travel.distance,
                   rating.time.series, all.games.elo)
 
 # Optimisation call
@@ -127,8 +126,8 @@ harm.search.res <- HarmonySearch(OptimWrapperRunElo, fixed.params = fixed, data.
                                  f.upper = f.upper,
                                  fw.d = fw.d,
                                  hms = 30, hmcr = 0.9, par = 0.3,
-                                 itn.max = 700, minimize = TRUE,
-                                 hm.init = hm.prev)
+                                 itn.max = 450, minimize = TRUE,
+                                 hm.init = NULL)
 
 #optim.result <- optim(par = tunable.params.init, OptimWrapperRunElo,
                       #fixed.params = fixed, data.inputs = df.inputs,
