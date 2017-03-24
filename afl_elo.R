@@ -1,20 +1,8 @@
 
-CalculateGroundAdj <- function(team, ground, season.current, ground.panel.record,
-                               param.time.window, param.coeff.wins, param.coeff.other) {
-  idx <- (ground.panel.record$team == team) &
-         (ground.panel.record$ground == ground) &
-         (ground.panel.record$season >= season.current - param.time.window) &
-         (ground.panel.record$season <= season.current)
-
-  n.wins <- sum(ground.panel.record[idx, "wins"])
-  n.other <- sum(ground.panel.record[idx, "losses"],
-                 ground.panel.record[idx, "draws"])
-  
-  ground.adj <- (param.coeff.wins * log10(n.wins + 1)) + (param.coeff.other * log10(n.other + 1))
-
+CalculateGroundAdj <- function(team, ground, ground.data) {
+  ground.adj <- ground.data[ground, team]
   ground.adj
 }
-
 
 CalculateTravelAdj <- function(team, ground, team.data, ground.location, travel.distance, param.coeff.travel) {
   team.location <- team.data[team, 'location']
@@ -52,12 +40,12 @@ RegressRating <- function(rating, param.rating.mean, param.regress) {
 
 
 RunElo <- function(all.games, team.dictionary, team.data,
-                   ground.location, ground.panel.record, travel.distance,
+                   ground.location, ground.data, travel.distance,
                    rating.time.series, all.games.elo,
                    param.rating.mean, param.spread,
                    param.margin,
-                   param.coeff.rating.update, param.regress.rating, 
-                   param.time.window, param.coeff.wins, param.coeff.other,
+                   param.coeff.rating.update, param.regress.rating,
+                   param.coeff.ground.update, param.regress.ground,
                    param.coeff.travel,
                    param.rating.expansion.init,
                    do.store.detail = FALSE) {
@@ -92,6 +80,7 @@ RunElo <- function(all.games, team.dictionary, team.data,
       yes.regress <- (team.data$season.start < season.current) & (team.data$season.end >= season.current)
       if (any(yes.regress)) {
         team.data$rating[yes.regress] <- RegressRating(team.data$rating[yes.regress], param.rating.mean, param.regress.rating)
+        ground.data[, c(F, yes.regress)] <- RegressRating(ground.data[, c(F, yes.regress)], 0, param.regress.ground)
       }
       
       # Determine active teams and record their rating at season start (after regression)
@@ -125,10 +114,8 @@ RunElo <- function(all.games, team.dictionary, team.data,
     rating.away <- team.data[team.away, 'rating']
 
     # Determine ground adjustments
-    rating.ground.adj.home <- CalculateGroundAdj(team.home, ground, season.current, ground.panel.record,
-                                                 param.time.window, param.coeff.wins, param.coeff.other)
-    rating.ground.adj.away <- CalculateGroundAdj(team.away, ground, season.current, ground.panel.record,
-                                                 param.time.window, param.coeff.wins, param.coeff.other)
+    rating.ground.adj.home <- CalculateGroundAdj(team.home, ground, ground.data)
+    rating.ground.adj.away <- CalculateGroundAdj(team.away, ground, ground.data)
 
     # Determine travel adjustments
     rating.travel.adj.home <- CalculateTravelAdj(team.home, ground, team.data, ground.location, travel.distance, param.coeff.travel)
@@ -152,35 +139,41 @@ RunElo <- function(all.games, team.dictionary, team.data,
     # Calculate the new ratings based on the difference between expected and actual results
     rating.home.new <- CalculateRatingNew(rating.home, result.exp.home, result.act.home, param.coeff.rating.update)
     rating.away.new <- CalculateRatingNew(rating.away, result.exp.away, result.act.away, param.coeff.rating.update)
-    
+
+    # Calculate the new ground ratings based on the difference between expected and actual results
+    rating.ground.adj.home.new <- CalculateRatingNew(rating.ground.adj.home, result.exp.home, result.act.home, param.coeff.ground.update)
+    rating.ground.adj.away.new <- CalculateRatingNew(rating.ground.adj.away, result.exp.away, result.act.away, param.coeff.ground.update)
+
     # Store the new ratings
     team.data[team.home, 'rating'] <- rating.home.new
     team.data[team.away, 'rating'] <- rating.away.new
+    ground.data[ground, team.home] <- rating.ground.adj.home.new
+    ground.data[ground, team.away] <- rating.ground.adj.away.new
     rating.time.series[season.round.current, team.home] <- rating.home.new
     rating.time.series[season.round.current, team.away] <- rating.away.new
 
     # Determine outcome (win/loss/draw) for the home team, and also update the
     # ground panel records with the win/loss/draw outcome
-    idx.gpr.team.home <- (ground.panel.record$team == team.home) &
-                         (ground.panel.record$ground == ground) &
-                         (ground.panel.record$season == season.current)
-    idx.gpr.team.away <- (ground.panel.record$team == team.away) &
-                         (ground.panel.record$ground == ground) &
-                         (ground.panel.record$season == season.current)
-    ground.panel.record[idx.gpr.team.home, "played"] <- ground.panel.record[idx.gpr.team.home, "played"] + 1
-    ground.panel.record[idx.gpr.team.away, "played"] <- ground.panel.record[idx.gpr.team.away, "played"] + 1
+    #idx.gpr.team.home <- (ground.panel.record$team == team.home) &
+                         #(ground.panel.record$ground == ground) &
+                         #(ground.panel.record$season == season.current)
+    #idx.gpr.team.away <- (ground.panel.record$team == team.away) &
+                         #(ground.panel.record$ground == ground) &
+                         #(ground.panel.record$season == season.current)
+    #ground.panel.record[idx.gpr.team.home, "played"] <- ground.panel.record[idx.gpr.team.home, "played"] + 1
+    #ground.panel.record[idx.gpr.team.away, "played"] <- ground.panel.record[idx.gpr.team.away, "played"] + 1
     if (score.points.home > score.points.away) {
       outcome.home <- 1
-      ground.panel.record[idx.gpr.team.home, "wins"] <- ground.panel.record[idx.gpr.team.home, "wins"] + 1
-      ground.panel.record[idx.gpr.team.away, "losses"] <- ground.panel.record[idx.gpr.team.away, "losses"] + 1
+      #ground.panel.record[idx.gpr.team.home, "wins"] <- ground.panel.record[idx.gpr.team.home, "wins"] + 1
+      #ground.panel.record[idx.gpr.team.away, "losses"] <- ground.panel.record[idx.gpr.team.away, "losses"] + 1
     } else if (score.points.home < score.points.away) {
       outcome.home <- 0
-      ground.panel.record[idx.gpr.team.home, "losses"] <- ground.panel.record[idx.gpr.team.home, "losses"] + 1
-      ground.panel.record[idx.gpr.team.away, "wins"] <- ground.panel.record[idx.gpr.team.away, "wins"] + 1
+      #ground.panel.record[idx.gpr.team.home, "losses"] <- ground.panel.record[idx.gpr.team.home, "losses"] + 1
+      #ground.panel.record[idx.gpr.team.away, "wins"] <- ground.panel.record[idx.gpr.team.away, "wins"] + 1
     } else {
       outcome.home <- 0.5
-      ground.panel.record[idx.gpr.team.home, "draws"] <- ground.panel.record[idx.gpr.team.home, "draws"] + 1
-      ground.panel.record[idx.gpr.team.away, "draws"] <- ground.panel.record[idx.gpr.team.away, "draws"] + 1
+      #ground.panel.record[idx.gpr.team.home, "draws"] <- ground.panel.record[idx.gpr.team.home, "draws"] + 1
+      #ground.panel.record[idx.gpr.team.away, "draws"] <- ground.panel.record[idx.gpr.team.away, "draws"] + 1
     }
 
     brier.game <- (result.exp.home - outcome.home) ^ 2
@@ -212,7 +205,7 @@ RunElo <- function(all.games, team.dictionary, team.data,
 
   # Collate and return the results
   elo.result <- list(team.data, rating.time.series,
-                     ground.panel.record, all.games.elo,
+                     ground.data, all.games.elo,
                      margin.cumulative.abs.error, result.cumulative.sq.error,
                      brier.cumulative.error, log.score.cumulative.error)
   elo.result
