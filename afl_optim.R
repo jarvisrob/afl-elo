@@ -12,9 +12,9 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
   param.regress.rating <- tunable.params[3]
   
   param.coeff.ground.update <- tunable.params[4]
-  param.regress.ground <- tunable.params[5]
 
-  param.coeff.travel <- tunable.params[6]
+  param.coeff.travel <- tunable.params[5]
+  param.power.travel <- tunable.params[6]
 
   param.rating.expansion.init <- tunable.params[7]
 
@@ -41,8 +41,8 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
                        param.rating.mean, param.spread,
                        param.margin,
                        param.coeff.rating.update, param.regress.rating,
-                       param.coeff.ground.update, param.regress.ground,
-                       param.coeff.travel,
+                       param.coeff.ground.update,
+                       param.coeff.travel, param.power.travel,
                        param.rating.expansion.init,
                        do.store.detail = FALSE)
   
@@ -58,14 +58,14 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
   brier.cumulative.error <- elo.result[[7]]
   #log.score.cumulative.error <- elo.result[[8]]
   
-  margin.mae <- margin.sum.abs.error / sum(all.games$season >= 1994)
+  margin.mae <- margin.sum.abs.error / sum(all.games$season >= 2000)
   print(paste0("Margin MAE = ", as.character(margin.mae)))
   #margin.mae
   
   #print(result.sum.sq.error)
   #result.sum.sq.error
 
-  brier.score <- brier.cumulative.error / sum(all.games$season >= 1994)
+  brier.score <- brier.cumulative.error / sum(all.games$season >= 2000)
   print(paste0("Brier score = ", as.character(brier.score)))
   #brier.cumulative.error
 
@@ -84,29 +84,37 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
 
 
 # Initial values
-tunable.params.type <- c("continuous", "continuous", "continuous", "continuous", "continuous", "continuous", "continuous")
+tunable.params.type <- c("continuous", 
+                         "continuous", "continuous", 
+                         "continuous", 
+                         "continuous", "continuous", 
+                         "continuous")
 
 #tunable.params.init <- c(0.01,
                          #50.0, 0.2,
                          #3, 5.0, 2.0,
                          #15.0,
                          #1300.0)
-tunable.params.lower <- c(0.000001,
-                          0.1, 0,
-                          0, 0,
-                          0.001,
+tunable.params.lower <- c(0.001,
+                          50.0, 0.05,
+                          0, 
+                          20.0, 0.05,
                           750.0)
-tunable.params.upper <- c(0.2,
-                          150.0, 0.5,
-                          100.0, 1.0,
-                          150.0,
-                          1500.0)
+tunable.params.upper <- c(0.05,
+                          100.0, 0.25,
+                          5.0, 
+                          50.0, 0.25,
+                          1100.0)
 fixed <- c(1500.0, 400.0)
 
 f.lower <- c(0, 0)
 f.upper <- c(Inf, 30.0)
 
-fw.d <- c(0.0002, 0.15, 0.0005, 1, 0.0005, 0.0005, 0.0015, 1.0)
+fw.d <- c(0.00005, 
+          0.05, 0.0002,
+          0.005, 
+          0.03, 0.0002,
+          0.35)
 
 # Data inputs
 df.inputs <- list(all.games, team.dictionary, team.data,
@@ -125,9 +133,9 @@ harm.search.res <- HarmonySearch(OptimWrapperRunElo, fixed.params = fixed, data.
                                  f.lower = f.lower,
                                  f.upper = f.upper,
                                  fw.d = fw.d,
-                                 hms = 30, hmcr = 0.9, par = 0.3,
-                                 itn.max = 450, minimize = TRUE,
-                                 hm.init = NULL)
+                                 hms = 70, hmcr = 0.9, par = 0.3,
+                                 itn.max = 2400, minimize = TRUE,
+                                 hm.init = hm)
 
 #optim.result <- optim(par = tunable.params.init, OptimWrapperRunElo,
                       #fixed.params = fixed, data.inputs = df.inputs,

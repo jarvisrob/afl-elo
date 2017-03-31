@@ -8,8 +8,8 @@ CheckCalibration <- function(games.elo, bin.width) {
 
   calib <- data.frame(bin.mid = bin.mid, win.frac.home = win.frac.home, calib.error = calib.error)
 
-  #plot(calib$bin.mid, calib$win.frac.home)
-  #lines(c(0, 1), c(0, 1))
+  plot(calib$bin.mid, calib$win.frac.home)
+  lines(c(0, 1), c(0, 1))
 
   calib
 }

@@ -4,11 +4,11 @@ CalculateGroundAdj <- function(team, ground, ground.data) {
   ground.adj
 }
 
-CalculateTravelAdj <- function(team, ground, team.data, ground.location, travel.distance, param.coeff.travel) {
+CalculateTravelAdj <- function(team, ground, team.data, ground.location, travel.distance, param.coeff.travel, param.power.travel) {
   team.location <- team.data[team, 'location']
   distance <- travel.distance[ground.location[ground, ], team.location]
   
-  travel.adj <- -param.coeff.travel * log10(distance + 1)
+  travel.adj <- -param.coeff.travel * (distance ^ param.power.travel)
   
   travel.adj
 }
@@ -45,8 +45,8 @@ RunElo <- function(all.games, team.dictionary, team.data,
                    param.rating.mean, param.spread,
                    param.margin,
                    param.coeff.rating.update, param.regress.rating,
-                   param.coeff.ground.update, param.regress.ground,
-                   param.coeff.travel,
+                   param.coeff.ground.update,
+                   param.coeff.travel, param.power.travel,
                    param.rating.expansion.init,
                    do.store.detail = FALSE) {
   
@@ -80,7 +80,7 @@ RunElo <- function(all.games, team.dictionary, team.data,
       yes.regress <- (team.data$season.start < season.current) & (team.data$season.end >= season.current)
       if (any(yes.regress)) {
         team.data$rating[yes.regress] <- RegressRating(team.data$rating[yes.regress], param.rating.mean, param.regress.rating)
-        ground.data[, c(F, yes.regress)] <- RegressRating(ground.data[, c(F, yes.regress)], 0, param.regress.ground)
+        #ground.data[, c(F, yes.regress)] <- RegressRating(ground.data[, c(F, yes.regress)], 0, param.regress.ground)
       }
       
       # Determine active teams and record their rating at season start (after regression)
@@ -93,7 +93,7 @@ RunElo <- function(all.games, team.dictionary, team.data,
       }
 
       # Start calibration/optimisation for 1994 season
-      if (season.current == 1994) {
+      if (season.current == 2000) {
         margin.cumulative.abs.error <- 0
         result.cumulative.sq.error <- 0
         brier.cumulative.error <- 0
@@ -118,8 +118,8 @@ RunElo <- function(all.games, team.dictionary, team.data,
     rating.ground.adj.away <- CalculateGroundAdj(team.away, ground, ground.data)
 
     # Determine travel adjustments
-    rating.travel.adj.home <- CalculateTravelAdj(team.home, ground, team.data, ground.location, travel.distance, param.coeff.travel)
-    rating.travel.adj.away <- CalculateTravelAdj(team.away, ground, team.data, ground.location, travel.distance, param.coeff.travel)
+    rating.travel.adj.home <- CalculateTravelAdj(team.home, ground, team.data, ground.location, travel.distance, param.coeff.travel, param.power.travel)
+    rating.travel.adj.away <- CalculateTravelAdj(team.away, ground, team.data, ground.location, travel.distance, param.coeff.travel, param.power.travel)
 
     # Determine adjusted ratings = rating + ground adj + travel adj
     rating.home.adj <- rating.home + rating.ground.adj.home + rating.travel.adj.home
