@@ -2,26 +2,35 @@
 CheckCalibration <- function(games.elo, bin.width) {
   bin.edges <- lapply(seq(0, 1 - bin.width, by = bin.width),
                       function(x) c(x, x + bin.width))
-  win.frac.home <- sapply(bin.edges, GetFracHomeWinsInBin, games.elo)
+
+  # Randomise checking home or away team result vs outcome
+  n.games <- nrow(games.elo)
+  rand.logical <- sample(c(TRUE, FALSE), n.games, replace = TRUE)
+  games.rand <- data.frame(result.exp = rep(0, n.games), outcome = rep(0, n.games))
+  games.rand[rand.logical, "result.exp"] <- games.elo[rand.logical, "result.exp.home"]
+  games.rand[rand.logical, "outcome"] <- games.elo[rand.logical, "outcome.home"]
+  games.rand[!rand.logical, "result.exp"] <- games.elo[!rand.logical, "result.exp.away"]
+  games.rand[!rand.logical, "outcome"] <- 1 - games.elo[!rand.logical, "outcome.home"]
+
+  win.frac <- sapply(bin.edges, GetFracWinsInBin, games.rand)
   bin.mid <- seq(bin.width / 2, 1 - bin.width / 2, by = bin.width)
-  calib.error <- win.frac.home - bin.mid
+  calib.error <- win.frac - bin.mid
 
-  calib <- data.frame(bin.mid = bin.mid, win.frac.home = win.frac.home, calib.error = calib.error)
+  calib <- data.frame(bin.mid = bin.mid, win.frac = win.frac, calib.error = calib.error)
 
-  plot(calib$bin.mid, calib$win.frac.home)
+  plot(calib$bin.mid, calib$win.frac)
   lines(c(0, 1), c(0, 1))
 
   calib
 }
 
-GetFracHomeWinsInBin <- function(bin.edges, games.elo) {
+GetFracWinsInBin <- function(bin.edges, games) {
   bin.lower <- bin.edges[1]
   bin.upper <- bin.edges[2]
 
-  games.in.bin <- games.elo[games.elo$result.exp.home > bin.lower & 
-                            games.elo$result.exp.home <= bin.upper, ]
+  games.in.bin <- games[games$result.exp > bin.lower & games$result.exp <= bin.upper, ]
   n.games <- nrow(games.in.bin)
-  n.wins <- sum(games.in.bin$outcome.home)
+  n.wins <- sum(games.in.bin$outcome)
 
   if (n.games == 0) {
     frac.wins <- NA
