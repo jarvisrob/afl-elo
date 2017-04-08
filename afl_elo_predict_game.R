@@ -1,4 +1,9 @@
-PredictGame <- function(team.home, team.away, ground, team.data, ground.data, ground.location, travel.distance, commission = 0, param.spread = 400, param.margin = 0.0218, param.coeff.travel = 34.7, param.power.travel = 0.136) {
+PredictGame <- function(team.home, team.away, ground, 
+                        team.data, ground.data, ground.location, travel.distance, 
+                        commission = 0, 
+                        param.spread = 400, 
+                        param.margin = 0.02395478,
+                        param.coeff.travel = 17.70182, param.power.travel = 0.2377348) {
 
   # Extract team ratings
   rating.home <- team.data[team.home, 'rating']

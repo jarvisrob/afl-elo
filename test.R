@@ -1,13 +1,16 @@
 # Set the working dir
 setwd("C:/Lab/afl-elo")
 
+# Load packages
+library(tictoc)
+
 # Source
 source('afltables_all_games_prep.R')
 source('afl_elo_init.R')
 source('afl_elo.R')
 
 # Init
-all.games <- GetAllGames(do.download = F)
+all.games <- GetAllGames(do.download = FALSE)
 all.games.elo <- InitAllGamesElo(all.games)
 team.dictionary <- InitTeamLDictionary()
 team.data <- InitTeamData()
@@ -24,11 +27,11 @@ elo.result <- RunElo(all.games, team.dictionary, team.data,
                      ground.location, ground.data, travel.distance,
                      rating.time.series, all.games.elo,
                      param.rating.mean = 1500, param.spread = 400,
-                     param.margin = 0.0218,
-                     param.coeff.rating.update = 79, param.regress.rating = 0.17,
-                     param.coeff.ground.update = 1.4,
-                     param.coeff.travel = 34.7, param.power.travel = 0.136,
-                     param.rating.expansion.init = 910,
+                     param.margin = 0.02395478,
+                     param.coeff.rating.update = 76.75845, param.regress.rating = 0.2062030,
+                     param.coeff.ground.update = 1.653744,
+                     param.coeff.travel = 17.70182, param.power.travel = 0.2377348,
+                     param.rating.expansion.init = 1335,
                      do.store.detail = TRUE)
 
 #param.coeff.ground.update = 25.58827, param.regress.ground = 0.1051385,
@@ -40,6 +43,6 @@ rating.time.series.run <- elo.result[[2]]
 ground.data.run <- elo.result[[3]]
 all.games.elo.run <- elo.result[[4]]
 margin.sum.abs.error <- elo.result[[5]]
-result.sum.sq.error <- elo.result[[6]]
+result.sum.abs.error <- elo.result[[6]]
 brier.cumulative.error <- elo.result[[7]]
 log.score.cumulative.error <- elo.result[[8]]

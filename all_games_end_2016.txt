@@ -14993,21 +14993,3 @@ All games in chronological order
 14991. 23-Sep-2016      PF   Sydney            15.7.97          Geelong           8.12.60           M.C.G.
 14992. 24-Sep-2016      PF   Western Bulldogs  13.11.89         GW Sydney         12.11.83          Sydney Showground
 14993. 1-Oct-2016       GF   Western Bulldogs  13.11.89         Sydney            10.7.67           M.C.G.
-14994. 23-Mar-2017      R1   Carlton           14.5.89          Richmond          20.12.132         M.C.G.
-14995. 24-Mar-2017      R1   Collingwood       12.14.86         Western Bulldogs  15.10.100         M.C.G.
-14996. 25-Mar-2017      R1   St Kilda          13.12.90         Melbourne         18.12.120         Docklands
-14997. 25-Mar-2017      R1   Sydney            12.10.82         Port Adelaide     17.8.110          S.C.G.
-14998. 25-Mar-2017      R1   Essendon          17.14.116        Hawthorn          12.19.91          M.C.G.
-14999. 25-Mar-2017      R1   Gold Coast        14.12.96         Brisbane Lions    15.8.98           Carrara
-15000. 26-Mar-2017      R1   North Melbourne   13.15.93         West Coast        21.10.136         Docklands
-15001. 26-Mar-2017      R1   Adelaide          22.15.147        GW Sydney         14.7.91           Adelaide Oval
-15002. 26-Mar-2017      R1   Fremantle         10.13.73         Geelong           18.7.115          Subiaco
-15003. 30-Mar-2017      R2   Richmond          14.15.99         Collingwood       11.14.80          M.C.G.
-15004. 31-Mar-2017      R2   Western Bulldogs  16.14.110        Sydney            13.9.87           Docklands
-15005. 1-Apr-2017       R2   Hawthorn          13.11.89         Adelaide          16.17.113         M.C.G.
-15006. 1-Apr-2017       R2   GW Sydney         24.16.160        Gold Coast        8.10.58           Sydney Showground
-15007. 1-Apr-2017       R2   Brisbane Lions    12.12.84         Essendon          17.9.111          Gabba
-15008. 1-Apr-2017       R2   West Coast        18.8.116         St Kilda          13.19.97          Subiaco
-15009. 2-Apr-2017       R2   Geelong           17.10.112        North Melbourne   17.9.111          Docklands
-15010. 2-Apr-2017       R2   Melbourne         13.8.86          Carlton           9.10.64           M.C.G.
-15011. 2-Apr-2017       R2   Port Adelaide     22.13.145        Fremantle         8.8.56            Adelaide Oval

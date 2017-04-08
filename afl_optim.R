@@ -12,6 +12,7 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
   param.regress.rating <- tunable.params[3]
   
   param.coeff.ground.update <- tunable.params[4]
+  #param.regress.ground <- tunable.params[5]
 
   param.coeff.travel <- tunable.params[5]
   param.power.travel <- tunable.params[6]
@@ -53,19 +54,20 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
   #all.games.elo.run <- elo.result[[4]]
 
   margin.sum.abs.error <- elo.result[[5]]
-  #result.sum.sq.error <- elo.result[[6]]
+  result.sum.abs.error <- elo.result[[6]]
 
   brier.cumulative.error <- elo.result[[7]]
-  #log.score.cumulative.error <- elo.result[[8]]
+  log.score.cumulative.error <- elo.result[[8]]
   
-  margin.mae <- margin.sum.abs.error / sum(all.games$season >= 2000)
+  margin.mae <- margin.sum.abs.error / sum(all.games$season >= 1994)
   print(paste0("Margin MAE = ", as.character(margin.mae)))
   #margin.mae
   
   #print(result.sum.sq.error)
-  #result.sum.sq.error
+  result.mae <- result.sum.abs.error / sum(all.games$season >= 1994)
+  print(paste0("Result MAE = ", result.mae))
 
-  brier.score <- brier.cumulative.error / sum(all.games$season >= 2000)
+  brier.score <- brier.cumulative.error / sum(all.games$season >= 1994)
   print(paste0("Brier score = ", as.character(brier.score)))
   #brier.cumulative.error
 
@@ -75,7 +77,8 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
   #print(paste0("SS calib error = ", as.character(ss.calib.error)))
 
   #print(log.score.cumulative.error)
-  #log.score.cumulative.error
+  log.score <- log.score.cumulative.error / sum(all.games$season >= 1994)
+  print(paste0("Log score = ", as.character(log.score)))
 
   print("---")
   output <- list(brier.score = brier.score, margin.mae = margin.mae)
@@ -86,7 +89,7 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
 # Initial values
 tunable.params.type <- c("continuous", 
                          "continuous", "continuous", 
-                         "continuous", 
+                         "continuous",
                          "continuous", "continuous", 
                          "continuous")
 
@@ -95,26 +98,22 @@ tunable.params.type <- c("continuous",
                          #3, 5.0, 2.0,
                          #15.0,
                          #1300.0)
-tunable.params.lower <- c(0.001,
-                          50.0, 0.05,
-                          0, 
-                          20.0, 0.05,
-                          750.0)
+tunable.params.lower <- c(0.0001,
+                          40.0, 0,
+                          0,
+                          5.0, 0.05,
+                          700.0)
 tunable.params.upper <- c(0.05,
-                          100.0, 0.25,
-                          5.0, 
-                          50.0, 0.25,
-                          1100.0)
+                          125.0, 0.33,
+                          10.0,
+                          50.0, 0.33,
+                          1400.0)
 fixed <- c(1500.0, 400.0)
 
 f.lower <- c(0, 0)
-f.upper <- c(Inf, 30.0)
+f.upper <- c(Inf, 31.0)  # brier score, margin MAE
 
-fw.d <- c(0.00005, 
-          0.05, 0.0002,
-          0.005, 
-          0.03, 0.0002,
-          0.35)
+fw.d <- (tunable.params.upper - tunable.params.lower) / 1000
 
 # Data inputs
 df.inputs <- list(all.games, team.dictionary, team.data,
@@ -133,8 +132,8 @@ harm.search.res <- HarmonySearch(OptimWrapperRunElo, fixed.params = fixed, data.
                                  f.lower = f.lower,
                                  f.upper = f.upper,
                                  fw.d = fw.d,
-                                 hms = 70, hmcr = 0.9, par = 0.3,
-                                 itn.max = 2400, minimize = TRUE,
+                                 hms = 50, hmcr = 0.9, par = 0.3,
+                                 itn.max = 4000, minimize = TRUE,
                                  hm.init = hm)
 
 #optim.result <- optim(par = tunable.params.init, OptimWrapperRunElo,

@@ -57,7 +57,7 @@ RunElo <- function(all.games, team.dictionary, team.data,
   
   # Initialise error tracking variables
   margin.cumulative.abs.error <- 0
-  result.cumulative.sq.error <- 0
+  result.cumulative.abs.error <- 0
   brier.cumulative.error <- 0
   log.score.cumulative.error <- 0
   
@@ -93,9 +93,9 @@ RunElo <- function(all.games, team.dictionary, team.data,
       }
 
       # Start calibration/optimisation for 1994 season
-      if (season.current == 2000) {
+      if (season.current == 1994) {
         margin.cumulative.abs.error <- 0
-        result.cumulative.sq.error <- 0
+        result.cumulative.abs.error <- 0
         brier.cumulative.error <- 0
         log.score.cumulative.error <- 0
       }
@@ -194,7 +194,7 @@ RunElo <- function(all.games, team.dictionary, team.data,
 
     # Update the cumulative error tracking variables
     margin.cumulative.abs.error <- margin.cumulative.abs.error + abs(margin.act.home - margin.exp.home)
-    result.cumulative.sq.error <- result.cumulative.sq.error + (result.exp.home - result.act.home) ^ 2
+    result.cumulative.abs.error <- result.cumulative.abs.error + abs(result.exp.home - result.act.home)
     brier.cumulative.error <- brier.cumulative.error + brier.game
     log.score.cumulative.error <- log.score.cumulative.error + log.score.game
   
@@ -206,7 +206,7 @@ RunElo <- function(all.games, team.dictionary, team.data,
   # Collate and return the results
   elo.result <- list(team.data, rating.time.series,
                      ground.data, all.games.elo,
-                     margin.cumulative.abs.error, result.cumulative.sq.error,
+                     margin.cumulative.abs.error, result.cumulative.abs.error,
                      brier.cumulative.error, log.score.cumulative.error)
   elo.result
 }
