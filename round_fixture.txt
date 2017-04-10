@@ -1,0 +1,12 @@
+# 2017, R4 fixture
+
+team.home				team.away				ground
+west.coast.eagles		sydney					Subiaco
+north.melbourne			western.bulldogs		Docklands
+melbourne				fremantle				M.C.G.
+greater.western.sydney	port.adelaide			"Manuka Oval"
+carlton					gold.coast				Docklands
+adelaide				essendon				"Adelaide Oval"
+collingwood				st.kilda				Docklands
+brisbane.lions			richmond				Gabba
+hawthorn				geelong					M.C.G.

@@ -1,4 +1,37 @@
-PredictGame <- function(team.home, team.away, ground, 
+
+PredictRound <- function(fixture, season, rnd,
+                         team.data, ground.data, ground.location, travel.distance,
+                         team.dictionary.reverse,
+                         con = stdout(),
+                         commission = 0,
+                         param.spread = 400,
+                         param.margin = 0.02395478,
+                         param.coeff.travel = 17.70182, param.power.travel = 0.2377348) {
+  
+  txt <- sprintf("PREDICTIONS for %s, %s", season, rnd)
+  for (i in 1:nrow(fixture)) {
+    team.home <- fixture[i, "team.home"]
+    team.away <- fixture[i, "team.away"]
+    ground <- fixture[i, "ground"]
+    prediction <- PredictGame(team.home, team.away, ground,
+                              team.data, ground.data, ground.location, travel.distance,
+                              commission, param.spread, param.margin, 
+                              param.coeff.travel, param.power.travel)
+    prediction.txt <- WriteSinglePrediction("quiet", prediction, team.dictionary.reverse)
+    txt <- append(txt, c("", "", prediction.txt))
+  }
+  txt <- append(txt, "")
+
+  writeLines(txt, con)
+}
+
+
+LoadRoundFixture <- function(file.name = "round_fixture.txt") {
+  fixture <- read.table(file.name, header = T, sep = '', skip = 2, strip.white = T, as.is = T)
+}
+
+
+PredictGame <- function(team.home, team.away, ground,
                         team.data, ground.data, ground.location, travel.distance, 
                         commission = 0, 
                         param.spread = 400, 
@@ -36,23 +69,23 @@ PredictGame <- function(team.home, team.away, ground,
   lay.exchange.home <- (1 / result.exp.home - 1) * (1 - commission) + 1
   lay.exchange.away <- (1 / result.exp.away - 1) * (1 - commission) + 1
 
-  # Print details
-  print(paste0("HOME | Rating = ", as.character(round(rating.home, 1)),
-               " | Ground adj = ", as.character(round(rating.ground.adj.home, 1)),
-               " | Travel adj = ", as.character(round(rating.travel.adj.home, 1)),
-               " | Adj rating = ", as.character(round(rating.home.adj, 1))))
-  print(paste0("     | p = ", as.character(round(result.exp.home * 100, 1)), " per cent"))
-  print(paste0("     | Bookie:   Back > ", round(back.bookie.home, 2)))
-  print(paste0("     | Exchange: Back > ", round(back.exchange.home, 2),
-               " and/or Lay < ", round(lay.exchange.home, 2)))
-  print(paste0("AWAY | Rating = ", as.character(round(rating.away, 1)),
-               " | Ground adj = ", as.character(round(rating.ground.adj.away, 1)),
-               " | Travel adj = ", as.character(round(rating.travel.adj.away, 1)),
-               " | Adj rating = ", as.character(round(rating.away.adj, 1))))
-  print(paste0("     | p = ", as.character(round(result.exp.away * 100, 1)), " per cent"))
-  print(paste0("     | Bookie:   Back > ", round(back.bookie.away, 2)))
-  print(paste0("     | Exchange: Back > ", round(back.exchange.away, 2),
-               " and/or Lay < ", round(lay.exchange.away, 2)))
+  ## Print details
+  #print(paste0("HOME | Rating = ", as.character(round(rating.home, 1)),
+               #" | Ground adj = ", as.character(round(rating.ground.adj.home, 1)),
+               #" | Travel adj = ", as.character(round(rating.travel.adj.home, 1)),
+               #" | Adj rating = ", as.character(round(rating.home.adj, 1))))
+  #print(paste0("     | p = ", as.character(round(result.exp.home * 100, 1)), " per cent"))
+  #print(paste0("     | Bookie:   Back > ", round(back.bookie.home, 2)))
+  #print(paste0("     | Exchange: Back > ", round(back.exchange.home, 2),
+               #" and/or Lay < ", round(lay.exchange.home, 2)))
+  #print(paste0("AWAY | Rating = ", as.character(round(rating.away, 1)),
+               #" | Ground adj = ", as.character(round(rating.ground.adj.away, 1)),
+               #" | Travel adj = ", as.character(round(rating.travel.adj.away, 1)),
+               #" | Adj rating = ", as.character(round(rating.away.adj, 1))))
+  #print(paste0("     | p = ", as.character(round(result.exp.away * 100, 1)), " per cent"))
+  #print(paste0("     | Bookie:   Back > ", round(back.bookie.away, 2)))
+  #print(paste0("     | Exchange: Back > ", round(back.exchange.away, 2),
+               #" and/or Lay < ", round(lay.exchange.away, 2)))
     
   # Return prediction
   prediction <- list(team.home = team.home, team.away = team.away, ground = ground,
@@ -78,7 +111,7 @@ PredictGame <- function(team.home, team.away, ground,
 }
 
 
-WriteSinglePrediction <- function(file.name, prediction, team.dictionary.reverse) {
+WriteSinglePrediction <- function(con, prediction, team.dictionary.reverse) {
   col.widths <- c(13, 20, 20)
   cell.lead.space <- 2
   row.n.char <- sum(col.widths, 2, 2 * cell.lead.space)
@@ -150,9 +183,11 @@ WriteSinglePrediction <- function(file.name, prediction, team.dictionary.reverse
                                       col.widths, cell.lead.space),
            border.plus)
 
-  file.conn <- file(file.name)
-  writeLines(txt, con = file.conn)
-  close(file.conn)
+  if (con != "quiet") {
+    writeLines(txt, con)
+  }
+
+  txt
 }
 
 
