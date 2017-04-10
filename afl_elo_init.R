@@ -27,6 +27,31 @@ InitTeamLDictionary <- function() {
   team.dictionary
 }
 
+InitTeamDictionaryReverse <- function() {
+  team.dictionary.reverse <- list("adelaide" = "Adelaide Crows",
+                                  "brisbane.bears" = "Brisbane Bears",
+                                  "brisbane.lions" = "Brisbane Lions",
+                                  "carlton" = "Carlton",
+                                  "collingwood" = "Collingwood",
+                                  "essendon" = "Essendon",
+                                  "fitzroy" = "Fitzroy",
+                                  "fremantle" = "Fremantle",
+                                  "geelong" = "Geelong Cats",
+                                  "gold.coast" = "Gold Coast Suns",
+                                  "greater.western.sydney" = "GWS Giants",
+                                  "hawthorn" = "Hawthorn",
+                                  "melbourne" = "Melbourne",
+                                  "north.melbourne" = "North Melbourne",
+                                  "port.adelaide" = "Port Adelaide",
+                                  "richmond" = "Richmond",
+                                  "st.kilda" = "St Kilda",
+                                  "sydney" = "Sydney Swans",
+                                  "university" = "University",
+                                  "west.coast.eagles" = "West Coast Eagles",
+                                  "western.bulldogs" = "Western Bulldogs")
+  team.dictionary.reverse
+}
+
 
 InitTeamData <- function() {
   team.data <- read.table('afl_init_team_data.txt', header = T, sep = '', skip = 2, strip.white = T, as.is = T)

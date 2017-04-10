@@ -26,6 +26,7 @@ PredictGame <- function(team.home, team.away, ground,
   result.exp.home <- CalculateResultExp(delta.ratings, param.spread)
   result.exp.away <- 1 - result.exp.home
   margin.exp.home <- CalculateMarginExp(delta.ratings, param.spread, param.margin)
+  margin.exp.away <- -margin.exp.home
 
   # Betting odds
   back.bookie.home <- 1 / result.exp.home
@@ -54,7 +55,138 @@ PredictGame <- function(team.home, team.away, ground,
                " and/or Lay < ", round(lay.exchange.away, 2)))
     
   # Return prediction
-  prediction <- list(result.exp.home = result.exp.home, margin.exp.home = margin.exp.home)
+  prediction <- list(team.home = team.home, team.away = team.away, ground = ground,
+                     rating.home = rating.home,
+                     rating.ground.adj.home = rating.ground.adj.home,
+                     rating.travel.adj.home = rating.travel.adj.home,
+                     rating.home.adj = rating.home.adj,
+                     rating.away = rating.away,
+                     rating.ground.adj.away = rating.ground.adj.away,
+                     rating.travel.adj.away = rating.travel.adj.away,
+                     rating.away.adj = rating.away.adj,
+                     delta.home = delta.ratings,
+                     delta.away = -delta.ratings,
+                     result.exp.home = result.exp.home, result.exp.away = result.exp.away,
+                     margin.exp.home = margin.exp.home, margin.exp.away = margin.exp.away,
+                     back.bookie.home = back.bookie.home, back.bookie.away = back.bookie.away,
+                     back.exchange.home = back.exchange.home, lay.exchange.home = lay.exchange.home,
+                     back.exchange.away = back.exchange.away, lay.exchange.away = lay.exchange.away,
+                     commission = commission)
+
   prediction
 
+}
+
+
+WriteSinglePrediction <- function(file.name, prediction, team.dictionary.reverse) {
+  col.widths <- c(13, 20, 20)
+  cell.lead.space <- 2
+  row.n.char <- sum(col.widths, 2, 2 * cell.lead.space)
+
+  border.plus <- strrep("+", row.n.char)
+  border.dash <- strrep("-", row.n.char)
+
+  team.home.full <- team.dictionary.reverse[[prediction$team.home]]
+  team.away.full <- team.dictionary.reverse[[prediction$team.away]]
+
+  tip.home <- GetDescriptiveTip(prediction$result.exp.home)
+  tip.away <- GetDescriptiveTip(prediction$result.exp.away)  
+
+  txt <- c(border.plus,
+           paste0(toupper(team.home.full), " vs ", toupper(team.away.full), " at ",
+                  toupper(prediction$ground)),
+           border.dash,
+           AssemblePredictionTableRow("Team", team.home.full, team.away.full,
+                                      col.widths, cell.lead.space),
+           border.dash,
+           AssemblePredictionTableRow("Win prob.",
+                                      sprintf("%9.1f per cent", prediction$result.exp.home * 100),
+                                      sprintf("%9.1f per cent", prediction$result.exp.away * 100),
+                                      col.widths, cell.lead.space),
+           AssemblePredictionTableRow("Margin",
+                                      sprintf("%+9.1f points", prediction$margin.exp.home),
+                                      sprintf("%+9.1f points", prediction$margin.exp.away),
+                                      col.widths, cell.lead.space),
+           border.dash,
+           AssemblePredictionTableRow("Tip", tip.home, tip.away,
+                                      col.widths, cell.lead.space),
+           border.dash,
+           AssemblePredictionTableRow("Team rating",
+                                      sprintf("%9.1f", prediction$rating.home),
+                                      sprintf("%9.1f", prediction$rating.away),
+                                      col.widths, cell.lead.space),
+           AssemblePredictionTableRow("Travel adj.",
+                                      sprintf("%+9.1f", prediction$rating.travel.adj.home),
+                                      sprintf("%+9.1f", prediction$rating.travel.adj.away),
+                                      col.widths, cell.lead.space),
+           AssemblePredictionTableRow("Ground adj.",
+                                      sprintf("%+9.1f", prediction$rating.ground.adj.home),
+                                      sprintf("%+9.1f", prediction$rating.ground.adj.away),
+                                      col.widths, cell.lead.space),
+           border.dash,
+           AssemblePredictionTableRow("Rating tot.",
+                                      sprintf("%9.1f", prediction$rating.home.adj),
+                                      sprintf("%9.1f", prediction$rating.away.adj),
+                                      col.widths, cell.lead.space),
+           border.dash,
+           AssemblePredictionTableRow("Delta",
+                                      sprintf("%+9.1f", prediction$delta.home),
+                                      sprintf("%+9.1f", prediction$delta.away),
+                                      col.widths, cell.lead.space),
+           border.dash,
+           "Bookie",
+           AssemblePredictionTableRow(paste0(strrep(" ", cell.lead.space), "Back"),
+                                      sprintf("%10.2f", prediction$back.bookie.home),
+                                      sprintf("%10.2f", prediction$back.bookie.away),
+                                      col.widths, cell.lead.space),
+           sprintf("Exchange (commission of %.2f per cent)", prediction$commission * 100),
+           AssemblePredictionTableRow(paste0(strrep(" ", cell.lead.space), "Back"),
+                                      sprintf("%10.2f", prediction$back.exchange.home),
+                                      sprintf("%10.2f", prediction$back.exchange.away),
+                                      col.widths, cell.lead.space),
+           AssemblePredictionTableRow(paste0(strrep(" ", cell.lead.space), "Lay"),
+                                      sprintf("%10.2f", prediction$lay.exchange.home),
+                                      sprintf("%10.2f", prediction$lay.exchange.away),
+                                      col.widths, cell.lead.space),
+           border.plus)
+
+  file.conn <- file(file.name)
+  writeLines(txt, con = file.conn)
+  close(file.conn)
+}
+
+
+AssemblePredictionTableRow <- function(row.id, cont.home, cont.away,
+                                       col.widths, cell.lead.space) {
+  row.id.filled <- paste0(row.id, strrep(" ", col.widths[1] - nchar(row.id)))
+  cont.home.filled <- paste0(strrep(" ", cell.lead.space), cont.home, strrep(" ", col.widths[2] - nchar(cont.home)))
+  cont.away.filled <- paste0(strrep(" ", cell.lead.space), cont.away, strrep(" ", col.widths[3] - nchar(cont.away)))
+  row.str <- paste0(row.id.filled, "|", cont.home.filled, "|", cont.away.filled)
+}
+
+
+GetDescriptiveTip <- function(result.exp) {
+  wep.prob <- result.exp
+
+  if (result.exp < 0.5) {
+    win.lose <- "Lose"
+    wep.numerical <- 1 - result.exp
+  } else if (result.exp > 0.5) {
+    win.lose <- "Win"
+  } else {
+    win.lose <- "Draw"
+  }
+
+  if (wep.prob > 0.95) {
+    wep <- "Almost cert."
+  } else if (wep.prob > 0.75) {
+    wep <- "Likely"
+  } else if (wep.prob > 0.60) {
+    wep <- "Probable"
+  } else {
+    wep <- "Toss-up"
+  }
+
+  tip <- paste0(win.lose, ": ", wep)
+  tip
 }
