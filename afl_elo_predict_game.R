@@ -8,7 +8,7 @@ PredictRound <- function(fixture, season, rnd,
                          param.margin = 0.02395478,
                          param.coeff.travel = 17.70182, param.power.travel = 0.2377348) {
   
-  txt <- sprintf("PREDICTIONS for %s, %s", season, rnd)
+  txt <- c("", strrep("+", 26), sprintf("PREDICTIONS for %s-%s", season, rnd), strrep("+", 26))
   for (i in 1:nrow(fixture)) {
     team.home <- fixture[i, "team.home"]
     team.away <- fixture[i, "team.away"]
@@ -169,17 +169,17 @@ WriteSinglePrediction <- function(con, prediction, team.dictionary.reverse) {
            border.dash,
            "Bookie",
            AssemblePredictionTableRow(paste0(strrep(" ", cell.lead.space), "Back"),
-                                      sprintf("%10.2f", prediction$back.bookie.home),
-                                      sprintf("%10.2f", prediction$back.bookie.away),
+                                      sprintf(">%9.2f", prediction$back.bookie.home),
+                                      sprintf(">%9.2f", prediction$back.bookie.away),
                                       col.widths, cell.lead.space),
            sprintf("Exchange (commission of %.2f per cent)", prediction$commission * 100),
            AssemblePredictionTableRow(paste0(strrep(" ", cell.lead.space), "Back"),
-                                      sprintf("%10.2f", prediction$back.exchange.home),
-                                      sprintf("%10.2f", prediction$back.exchange.away),
+                                      sprintf(">%9.2f", prediction$back.exchange.home),
+                                      sprintf(">%9.2f", prediction$back.exchange.away),
                                       col.widths, cell.lead.space),
            AssemblePredictionTableRow(paste0(strrep(" ", cell.lead.space), "Lay"),
-                                      sprintf("%10.2f", prediction$lay.exchange.home),
-                                      sprintf("%10.2f", prediction$lay.exchange.away),
+                                      sprintf("<%9.2f", prediction$lay.exchange.home),
+                                      sprintf("<%9.2f", prediction$lay.exchange.away),
                                       col.widths, cell.lead.space),
            border.plus)
 
@@ -205,7 +205,7 @@ GetDescriptiveTip <- function(result.exp) {
 
   if (result.exp < 0.5) {
     win.lose <- "Lose"
-    wep.numerical <- 1 - result.exp
+    wep.prob <- 1 - result.exp
   } else if (result.exp > 0.5) {
     win.lose <- "Win"
   } else {
