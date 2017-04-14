@@ -1,5 +1,6 @@
 
 PredictRound <- function(fixture, season, rnd,
+                         all.games,
                          team.data, ground.data, ground.location, travel.distance,
                          team.dictionary.reverse,
                          con = stdout(),
@@ -7,8 +8,30 @@ PredictRound <- function(fixture, season, rnd,
                          param.spread = 400,
                          param.margin = 0.02395478,
                          param.coeff.travel = 17.70182, param.power.travel = 0.2377348) {
-  
+
   txt <- c("", strrep("+", 26), sprintf("PREDICTIONS for %s-%s", season, rnd), strrep("+", 26))
+
+  date.time.stamp <- paste0("Generated: ", Sys.time())
+  last.game.idx <- nrow(all.games)
+  last.game <- all.games[last.game.idx, ]
+  last.game.summary <- paste0("Last known game: ", last.game.idx, ". ",
+                              last.game$season, "-", last.game$round, " (",
+                              last.game$date, ") ",
+                              last.game$team.home, " ", last.game$score.home,
+                              " vs ", last.game$team.away, " ", last.game$score.away,
+                              " at ", last.game$ground)
+  txt <- append(txt, c("", date.time.stamp, last.game.summary))
+
+  git.commit.sha <- paste0("Git commit hash: ", system("git rev-parse HEAD", intern = TRUE))
+  git.status.output <- system("git status -s", intern = TRUE)
+  if (length(git.status.output) == 0) {
+    git.status.txt <- "Git status: Working tree clean"
+  } else {
+    git.status.txt <- append("Git status:", git.status.output)
+  }
+  txt <- append(txt, c("", git.commit.sha))
+  txt <- append(txt, git.status.txt)
+
   for (i in 1:nrow(fixture)) {
     team.home <- fixture[i, "team.home"]
     team.away <- fixture[i, "team.away"]

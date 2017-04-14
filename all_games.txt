@@ -15011,3 +15011,12 @@ All games in chronological order
 15009. 2-Apr-2017       R2   Geelong           17.10.112        North Melbourne   17.9.111          Docklands
 15010. 2-Apr-2017       R2   Melbourne         13.8.86          Carlton           9.10.64           M.C.G.
 15011. 2-Apr-2017       R2   Port Adelaide     22.13.145        Fremantle         8.8.56            Adelaide Oval
+15012. 7-Apr-2017       R3   Sydney            11.13.79         Collingwood       11.14.80          S.C.G.
+15013. 8-Apr-2017       R3   North Melbourne   10.7.67          GW Sydney         15.19.109         Bellerive Oval
+15014. 8-Apr-2017       R3   Richmond          11.10.76         West Coast        8.17.65           M.C.G.
+15015. 8-Apr-2017       R3   Geelong           20.6.126         Melbourne         13.19.97          Docklands
+15016. 8-Apr-2017       R3   Port Adelaide     12.11.83         Adelaide          15.10.100         Adelaide Oval
+15017. 8-Apr-2017       R3   Fremantle         13.11.89         Western Bulldogs  10.13.73          Subiaco
+15018. 9-Apr-2017       R3   St Kilda          14.23.107        Brisbane Lions    11.10.76          Docklands
+15019. 9-Apr-2017       R3   Carlton           7.15.57          Essendon          6.6.42            M.C.G.
+15020. 9-Apr-2017       R3   Gold Coast        21.13.139        Hawthorn          7.11.53           Carrara
