@@ -1,3 +1,9 @@
+# All output files in out/
+out/
+
+# all_games.txt downloaded from AFL Tables
+all_games.txt
+
 # History files
 .Rhistory
 .Rapp.history

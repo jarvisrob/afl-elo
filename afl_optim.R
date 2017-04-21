@@ -102,11 +102,11 @@ tunable.params.lower <- c(0.0001,
                           40.0, 0,
                           0,
                           5.0, 0.05,
-                          700.0)
+                          1000.0)
 tunable.params.upper <- c(0.05,
                           125.0, 0.33,
-                          10.0,
-                          50.0, 0.33,
+                          5.0,
+                          50.0, 0.40,
                           1400.0)
 fixed <- c(1500.0, 400.0)
 
@@ -133,7 +133,7 @@ harm.search.res <- HarmonySearch(OptimWrapperRunElo, fixed.params = fixed, data.
                                  f.upper = f.upper,
                                  fw.d = fw.d,
                                  hms = 50, hmcr = 0.9, par = 0.3,
-                                 itn.max = 4000, minimize = TRUE,
+                                 itn.max = 6000, minimize = TRUE,
                                  hm.init = hm)
 
 #optim.result <- optim(par = tunable.params.init, OptimWrapperRunElo,

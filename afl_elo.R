@@ -15,7 +15,8 @@ CalculateTravelAdj <- function(team, ground, team.data, ground.location, travel.
 
 
 CalculateResultExp <- function(delta.ratings, param.spread) {
-  result.exp <- 1 / (10 ^ (-delta.ratings / param.spread) + 1)
+  #result.exp <- 1 / (10 ^ (-delta.ratings / param.spread) + 1)
+  result.exp <- pnorm(delta.ratings, mean = 0, sd = param.spread/2 * sqrt(2))
 }
 
 
