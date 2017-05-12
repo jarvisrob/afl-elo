@@ -1,12 +1,12 @@
-# 2017, R5 fixture
+# 2017, R7 fixture
 
 team.home				team.away				ground
-port.adelaide			carlton					"Adelaide Oval"
-western.bulldogs		brisbane.lions			Docklands
-gold.coast				adelaide				Carrara
-sydney					greater.western.sydney	S.C.G.
-fremantle				north.melbourne			Subiaco
-st.kilda				geelong					Docklands
-hawthorn				west.coast.eagles		M.C.G.
-richmond				melbourne				M.C.G.
-essendon				collingwood				M.C.G.
+west.coast.eagles		western.bulldogs		Subiaco
+hawthorn				brisbane.lions			"York Park"
+st.kilda				carlton					Docklands
+greater.western.sydney	collingwood				"Sydney Showground"
+essendon				geelong					M.C.G.
+adelaide				melbourne				"Adelaide Oval"
+richmond				fremantle				M.C.G.
+gold.coast				port.adelaide			"Jiangwan Stadium"
+north.melbourne			sydney					Docklands

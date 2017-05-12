@@ -45,3 +45,4 @@
 'Yallourn'	            Yallourn
 'Yarraville Oval'	      Melbourne
 'York Park'	            Launceston
+'Jiangwan Stadium'		Shanghai
