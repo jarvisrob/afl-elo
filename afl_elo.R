@@ -16,17 +16,19 @@ CalculateTravelAdj <- function(team, ground, team.data, ground.location, travel.
 
 CalculateResultExp <- function(delta.ratings, param.spread) {
   #result.exp <- 1 / (10 ^ (-delta.ratings / param.spread) + 1)
-  result.exp <- pnorm(delta.ratings, mean = 0, sd = param.spread/2 * sqrt(2))
+  result.exp <- pnorm(delta.ratings, mean = 0, sd = param.spread / 2 * sqrt(2))
 }
 
 
 CalculateMarginExp <- function(delta.ratings, param.spread, param.margin) {
-  margin.exp <- delta.ratings / (param.margin * param.spread)
+  #margin.exp <- delta.ratings / (param.margin * param.spread)
+  margin.exp <- delta.ratings / (param.margin * param.spread / 2 * sqrt(2)) # CHECK THIS!!! Works, but need to do maths...
 }
 
 
 CalculateResultAct <- function(margin.act, param.margin) {
-  result.act <- 1 / (10 ^ (-param.margin * margin.act) + 1)
+  #result.act <- 1 / (10 ^ (-param.margin * margin.act) + 1)
+  result.act <- pnorm(param.margin * margin.act, mean = 0, sd = 1) # CHECK THIS!!! Works, but need to do maths...
 }
 
 

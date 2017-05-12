@@ -2,6 +2,7 @@
 setwd("C:/Lab/afl-elo")
 
 # Load packages
+#install.packages('tictoc')
 library(tictoc)
 
 # Source
@@ -35,10 +36,10 @@ elo.result <- RunElo(all.games, team.dictionary, team.data,
                      #param.coeff.ground.update = 1.653744,
                      #param.coeff.travel = 17.70182, param.power.travel = 0.2377348,
                      #param.rating.expansion.init = 1335,
-                     param.margin = 0.02406532,
-                     param.coeff.rating.update = 76.23047, param.regress.rating = 0.2027570,
-                     param.coeff.ground.update = 1.671814,
-                     param.coeff.travel = 10.42009, param.power.travel = 0.3089539,
+                     param.margin = 0.03213133,
+                     param.coeff.rating.update = 76.72256, param.regress.rating = 0.2038160,
+                     param.coeff.ground.update = 1.675048,
+                     param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
                      param.rating.expansion.init = 1330,
                      do.store.detail = TRUE)
 
@@ -55,10 +56,10 @@ brier.cumulative.error <- elo.result[[7]]
 log.score.cumulative.error <- elo.result[[8]]
 
 fixture <- LoadRoundFixture()
-PredictRound(fixture, 2017, "R5", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
+PredictRound(fixture, 2017, "R8", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
              param.spread = 400,
              #param.margin = 0.02395478,
              #param.coeff.travel = 17.70182, param.power.travel = 0.2377348,
-             param.margin = 0.02406532,
-             param.coeff.travel = 10.42009, param.power.travel = 0.3089539,
-             con = "out/afl_elo_pred_2017-R05.txt")
+             param.margin = 0.03213133,
+             param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
+             con = 'afl_elo_pred_2017-R08.txt')
