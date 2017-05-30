@@ -42,3 +42,17 @@ GetFracWinsInBin <- function(bin.edges, games) {
 }
 
 
+SelectHomeOrAwayValueRandom <- function(df, columns) {
+  n.games <- nrow(df)
+  n.columns <- length(columns)
+
+  rand.logical <- sample(c(TRUE, FALSE), n.games, replace = TRUE)
+
+  df.rand <- data.frame(matrix(rep(0, n.games * n.columns), ncol = n.columns))
+  colnames(df.rand) <- columns
+
+  df.rand[rand.logical, columns] <- df[rand.logical, paste0(columns, '.home')]
+  df.rand[!rand.logical, columns] <- df[!rand.logical, paste0(columns, '.away')]
+
+  df.rand
+}
