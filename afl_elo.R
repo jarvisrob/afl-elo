@@ -125,11 +125,11 @@ RunElo <- function(all.games, team.dictionary, team.data,
     rating.travel.adj.away <- CalculateTravelAdj(team.away, ground, team.data, ground.location, travel.distance, param.coeff.travel, param.power.travel)
 
     # Determine adjusted ratings = rating + ground adj + travel adj
-    rating.home.adj <- rating.home + rating.ground.adj.home + rating.travel.adj.home
-    rating.away.adj <- rating.away + rating.ground.adj.away + rating.travel.adj.away
+    rating.adj.home <- rating.home + rating.ground.adj.home + rating.travel.adj.home
+    rating.adj.away <- rating.away + rating.ground.adj.away + rating.travel.adj.away
 
     # Calculate the difference in adj ratings and the expected result and margin
-    delta.ratings <- rating.home.adj - rating.away.adj
+    delta.ratings <- rating.adj.home - rating.adj.away
     result.exp.home <- CalculateResultExp(delta.ratings, param.spread)
     result.exp.away <- 1 - result.exp.home
     margin.exp.home <- CalculateMarginExp(delta.ratings, param.spread, param.margin)
@@ -140,20 +140,20 @@ RunElo <- function(all.games, team.dictionary, team.data,
     result.act.away <- 1 - result.act.home
 
     # Calculate the new ratings based on the difference between expected and actual results
-    rating.home.new <- CalculateRatingNew(rating.home, result.exp.home, result.act.home, param.coeff.rating.update)
-    rating.away.new <- CalculateRatingNew(rating.away, result.exp.away, result.act.away, param.coeff.rating.update)
+    new.rating.home <- CalculateRatingNew(rating.home, result.exp.home, result.act.home, param.coeff.rating.update)
+    new.rating.away <- CalculateRatingNew(rating.away, result.exp.away, result.act.away, param.coeff.rating.update)
 
     # Calculate the new ground ratings based on the difference between expected and actual results
-    rating.ground.adj.home.new <- CalculateRatingNew(rating.ground.adj.home, result.exp.home, result.act.home, param.coeff.ground.update)
-    rating.ground.adj.away.new <- CalculateRatingNew(rating.ground.adj.away, result.exp.away, result.act.away, param.coeff.ground.update)
+    new.rating.ground.adj.home <- CalculateRatingNew(rating.ground.adj.home, result.exp.home, result.act.home, param.coeff.ground.update)
+    new.rating.ground.adj.away <- CalculateRatingNew(rating.ground.adj.away, result.exp.away, result.act.away, param.coeff.ground.update)
 
     # Store the new ratings
-    team.data[team.home, 'rating'] <- rating.home.new
-    team.data[team.away, 'rating'] <- rating.away.new
-    ground.data[ground, team.home] <- rating.ground.adj.home.new
-    ground.data[ground, team.away] <- rating.ground.adj.away.new
-    rating.time.series[season.round.current, team.home] <- rating.home.new
-    rating.time.series[season.round.current, team.away] <- rating.away.new
+    team.data[team.home, 'rating'] <- new.rating.home
+    team.data[team.away, 'rating'] <- new.rating.away
+    ground.data[ground, team.home] <- new.rating.ground.adj.home
+    ground.data[ground, team.away] <- new.rating.ground.adj.away
+    rating.time.series[season.round.current, team.home] <- new.rating.home
+    rating.time.series[season.round.current, team.away] <- new.rating.away
 
     # Determine outcome (win/loss/draw) for the home team, and also update the
     # ground panel records with the win/loss/draw outcome
@@ -185,14 +185,18 @@ RunElo <- function(all.games, team.dictionary, team.data,
     # Option to store the details of Elo variables for this game for post-analysis
     if (do.store.detail) {
       all.games.elo[game.idx, 1:2] <- c(team.home, team.away)
-      all.games.elo[game.idx, 3:ncol(all.games.elo)] <- c(rating.home, rating.ground.adj.home, rating.travel.adj.home, rating.home.adj,
-                                                          rating.away, rating.ground.adj.away, rating.travel.adj.away, rating.away.adj,
+      all.games.elo[game.idx, 3:ncol(all.games.elo)] <- c(rating.home, rating.ground.adj.home, rating.travel.adj.home, rating.adj.home,
+                                                          rating.away, rating.ground.adj.away, rating.travel.adj.away, rating.adj.away,
                                                           delta.ratings,
-                                                          result.exp.home, result.exp.away, margin.exp.home,
+                                                          result.exp.home, result.exp.away,
+                                                          margin.exp.home,
                                                           outcome.home, brier.game, log.score.game,
-                                                          result.act.home, result.act.away, margin.act.home,
-                                                          result.act.home - result.exp.home, result.act.away - result.exp.away, margin.act.home - margin.exp.home,
-                                                          rating.home.new - rating.home, rating.home.new, rating.away.new)
+                                                          result.act.home, result.act.away, 
+                                                          margin.act.home,
+                                                          result.act.home - result.exp.home, result.act.away - result.exp.away, 
+                                                          margin.act.home - margin.exp.home,
+                                                          new.rating.home - rating.home, 
+                                                          new.rating.home, new.rating.away)
     }
 
     # Update the cumulative error tracking variables

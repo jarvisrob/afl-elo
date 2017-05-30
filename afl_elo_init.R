@@ -139,14 +139,18 @@ InitGroundLocation <- function() {
 
 InitAllGamesElo <- function(all.games) {
   cn <- c("team.home", "team.away",
-          "rating.home.before", "rating.ground.adj.home.before", "rating.travel.adj.home", "rating.home.adj.before",
-          "rating.away.before", "rating.ground.adj.away.before", "rating.travel.adj.away", "rating.away.adj.before",
-          "delta.rating.before",
-          "result.exp.home", "result.exp.away", "margin.exp.home",
+          "rating.home", "rating.ground.adj.home", "rating.travel.adj.home", "rating.adj.home",
+          "rating.away", "rating.ground.adj.away", "rating.travel.adj.away", "rating.adj.away",
+          "delta.rating.home",
+          "result.exp.home", "result.exp.away",
+          "margin.exp.home",
           "outcome.home", "brier.game", "log.score.game",
-          "result.act.home", "result.act.away", "margin.act.home",
-          "result.error.home", "result.error.away", "margin.error.home",
-          "rating.delta.update.home", "rating.home.new", "rating.away.new")
+          "result.act.home", "result.act.away",
+          "margin.act.home",
+          "result.error.home", "result.error.away",
+          "margin.error.home",
+          "rating.delta.update.home", 
+          "new.rating.home", "new.rating.away")
   all.games.elo <- data.frame(matrix(NA, nrow = nrow(all.games), ncol = length(cn)))
   colnames(all.games.elo) <- cn
   
