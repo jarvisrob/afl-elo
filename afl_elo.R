@@ -129,13 +129,16 @@ RunElo <- function(all.games, team.dictionary, team.data,
     rating.adj.away <- rating.away + rating.ground.adj.away + rating.travel.adj.away
 
     # Calculate the difference in adj ratings and the expected result and margin
-    delta.ratings <- rating.adj.home - rating.adj.away
-    result.exp.home <- CalculateResultExp(delta.ratings, param.spread)
+    delta.rating.home <- rating.adj.home - rating.adj.away
+    delta.rating.away <- rating.adj.away - rating.adj.home
+    result.exp.home <- CalculateResultExp(delta.rating.home, param.spread)
     result.exp.away <- 1 - result.exp.home
-    margin.exp.home <- CalculateMarginExp(delta.ratings, param.spread, param.margin)
+    margin.exp.home <- CalculateMarginExp(delta.rating.home, param.spread, param.margin)
+    margin.exp.away <- -margin.exp.home
     
     # Determine the actual margin and result
     margin.act.home <- score.points.home - score.points.away
+    margin.act.away <- score.points.away - score.points.home
     result.act.home <- CalculateResultAct(margin.act.home, param.margin)
     result.act.away <- 1 - result.act.home
 
@@ -178,24 +181,26 @@ RunElo <- function(all.games, team.dictionary, team.data,
       #ground.panel.record[idx.gpr.team.home, "draws"] <- ground.panel.record[idx.gpr.team.home, "draws"] + 1
       #ground.panel.record[idx.gpr.team.away, "draws"] <- ground.panel.record[idx.gpr.team.away, "draws"] + 1
     }
+    outcome.away <- 1 - outcome.home
 
     brier.game <- (result.exp.home - outcome.home) ^ 2
     log.score.game <- (outcome.home * log(result.exp.home)) + ((1 - outcome.home) * log(1 - result.exp.home))
 
     # Option to store the details of Elo variables for this game for post-analysis
     if (do.store.detail) {
-      all.games.elo[game.idx, 1:2] <- c(team.home, team.away)
-      all.games.elo[game.idx, 3:ncol(all.games.elo)] <- c(rating.home, rating.ground.adj.home, rating.travel.adj.home, rating.adj.home,
+      all.games.elo[game.idx, 1:3] <- c(team.home, team.away, ground)  # Cols 1:3 separate because class = character not numeric
+      all.games.elo[game.idx, 4:ncol(all.games.elo)] <- c(rating.home, rating.ground.adj.home, rating.travel.adj.home, rating.adj.home,
                                                           rating.away, rating.ground.adj.away, rating.travel.adj.away, rating.adj.away,
-                                                          delta.ratings,
+                                                          delta.rating.home, delta.rating.away,
                                                           result.exp.home, result.exp.away,
-                                                          margin.exp.home,
-                                                          outcome.home, brier.game, log.score.game,
+                                                          margin.exp.home, margin.exp.away,
+                                                          outcome.home, outcome.away,
+                                                          brier.game, log.score.game,
                                                           result.act.home, result.act.away, 
-                                                          margin.act.home,
+                                                          margin.act.home, margin.act.away,
                                                           result.act.home - result.exp.home, result.act.away - result.exp.away, 
-                                                          margin.act.home - margin.exp.home,
-                                                          new.rating.home - rating.home, 
+                                                          margin.act.home - margin.exp.home, margin.act.away - margin.exp.away,
+                                                          new.rating.home - rating.home, new.rating.away - rating.away,
                                                           new.rating.home, new.rating.away)
     }
 
