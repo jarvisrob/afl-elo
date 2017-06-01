@@ -51,6 +51,9 @@ SelectHomeOrAwayValueRandom <- function(df, columns) {
   df.rand <- data.frame(matrix(rep(0, n.games * n.columns), ncol = n.columns))
   colnames(df.rand) <- columns
 
+  df.rand$selected <- "home"
+  df.rand[!rand.logical, "selected"] <- "away"
+
   df.rand[rand.logical, columns] <- df[rand.logical, paste0(columns, '.home')]
   df.rand[!rand.logical, columns] <- df[!rand.logical, paste0(columns, '.away')]
 
