@@ -4,13 +4,15 @@ CheckCalibration <- function(games.elo, bin.width) {
                       function(x) c(x, x + bin.width))
 
   # Randomise checking home or away team result vs outcome
-  n.games <- nrow(games.elo)
-  rand.logical <- sample(c(TRUE, FALSE), n.games, replace = TRUE)
-  games.rand <- data.frame(result.exp = rep(0, n.games), outcome = rep(0, n.games))
-  games.rand[rand.logical, "result.exp"] <- games.elo[rand.logical, "result.exp.home"]
-  games.rand[rand.logical, "outcome"] <- games.elo[rand.logical, "outcome.home"]
-  games.rand[!rand.logical, "result.exp"] <- games.elo[!rand.logical, "result.exp.away"]
-  games.rand[!rand.logical, "outcome"] <- 1 - games.elo[!rand.logical, "outcome.home"]
+  #n.games <- nrow(games.elo)
+  #rand.logical <- sample(c(TRUE, FALSE), n.games, replace = TRUE)
+  #games.rand <- data.frame(result.exp = rep(0, n.games), outcome = rep(0, n.games))
+  #games.rand[rand.logical, "result.exp"] <- games.elo[rand.logical, "result.exp.home"]
+  #games.rand[rand.logical, "outcome"] <- games.elo[rand.logical, "outcome.home"]
+  #games.rand[!rand.logical, "result.exp"] <- games.elo[!rand.logical, "result.exp.away"]
+  #games.rand[!rand.logical, "outcome"] <- 1 - games.elo[!rand.logical, "outcome.home"]
+
+  games.rand <- SelectHomeOrAwayValueRandom(games.elo, c("result.exp", "outcome"))
 
   win.frac <- sapply(bin.edges, GetFracWinsInBin, games.rand)
   bin.mid <- seq(bin.width / 2, 1 - bin.width / 2, by = bin.width)

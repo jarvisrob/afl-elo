@@ -11,9 +11,10 @@ source('afl_elo_init.R')
 source('afl_elo.R')
 source("afl_elo_predict_game.R")
 source("afl_elo_postproc.R")
+source("afl_elo_sim.R")
 
 # Init
-all.games <- GetAllGames(do.download = TRUE)
+all.games <- GetAllGames(do.download = FALSE)
 all.games.elo <- InitAllGamesElo(all.games)
 team.dictionary <- InitTeamLDictionary()
 team.dictionary.reverse <- InitTeamDictionaryReverse()
@@ -55,11 +56,12 @@ result.sum.abs.error <- elo.result[[6]]
 brier.cumulative.error <- elo.result[[7]]
 log.score.cumulative.error <- elo.result[[8]]
 
-fixture <- LoadRoundFixture()
-PredictRound(fixture, 2017, "R8", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
-             param.spread = 400,
-             #param.margin = 0.02395478,
-             #param.coeff.travel = 17.70182, param.power.travel = 0.2377348,
-             param.margin = 0.03213133,
-             param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
-             con = 'afl_elo_pred_2017-R08.txt')
+#fixture <- LoadRoundFixture()
+#PredictRound(fixture, 2017, "R11", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
+             #param.spread = 400,
+             ##param.margin = 0.02395478,
+             ##param.coeff.travel = 17.70182, param.power.travel = 0.2377348,
+             #param.margin = 0.03213133,
+             #param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
+             #con = 'out/afl_elo_pred_2017-R11.txt')
+             ##con = stdout())
