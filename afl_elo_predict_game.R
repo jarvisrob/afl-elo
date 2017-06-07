@@ -235,10 +235,10 @@ GetDescriptiveTip <- function(result.exp) {
     win.lose <- "Draw"
   }
 
-  if (wep.prob > 0.95) {
+  if (wep.prob >= 0.90) {
     wep <- "Almost cert."
-  } else if (wep.prob > 0.75) {
-    wep <- "Likely"
+  } else if (wep.prob >= 0.75) {
+    wep <- "Very likely"
   } else if (wep.prob > 0.60) {
     wep <- "Probable"
   } else {
