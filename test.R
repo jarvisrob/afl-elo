@@ -4,6 +4,7 @@ setwd("C:/Lab/afl-elo")
 # Load packages
 #install.packages('tictoc')
 library(tictoc)
+library(tidyverse)
 
 # Source
 source('afltables_all_games_prep.R')
@@ -14,7 +15,7 @@ source("afl_elo_postproc.R")
 source("afl_elo_sim.R")
 
 # Init
-all.games <- GetAllGames(do.download = FALSE)
+all.games <- GetAllGames(do.download = TRUE)
 all.games.elo <- InitAllGamesElo(all.games)
 team.dictionary <- InitTeamLDictionary()
 team.dictionary.reverse <- InitTeamDictionaryReverse()
@@ -42,6 +43,11 @@ elo.result <- RunElo(all.games, team.dictionary, team.data,
                      param.coeff.ground.update = 1.675048,
                      param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
                      param.rating.expansion.init = 1330,
+                     # param.margin = 0.01375898,
+                     # param.coeff.rating.update = 64.75447, param.regress.rating = 0.2627962,
+                     # param.coeff.ground.update = 9.455308,
+                     # param.coeff.travel = 19.19262, param.power.travel = 0.1026281,
+                     # param.rating.expansion.init = 1360,
                      do.store.detail = TRUE)
 
 toc()
@@ -55,13 +61,30 @@ margin.sum.abs.error <- elo.result[[5]]
 result.sum.abs.error <- elo.result[[6]]
 brier.cumulative.error <- elo.result[[7]]
 log.score.cumulative.error <- elo.result[[8]]
+margin.cumulative.sq.error <- elo.result[[9]]
 
-#fixture <- LoadRoundFixture()
-#PredictRound(fixture, 2017, "R11", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
-             #param.spread = 400,
-             ##param.margin = 0.02395478,
-             ##param.coeff.travel = 17.70182, param.power.travel = 0.2377348,
-             #param.margin = 0.03213133,
-             #param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
-             #con = 'out/afl_elo_pred_2017-R11.txt')
-             ##con = stdout())
+margin.rmse <- sqrt(margin.cumulative.sq.error / sum(all.games$season >= 1994))
+margin.mae <- margin.sum.abs.error / sum(all.games$season >= 1994)
+result.mae <- result.sum.abs.error / sum(all.games$season >= 1994)
+brier.score.ave <- brier.cumulative.error / sum(all.games$season >= 1994)
+log.score.ave <- log.score.cumulative.error / sum(all.games$season >= 1994)
+
+writeLines(c(paste0("Margin RMSE = ", margin.rmse), paste0("Margin MAE = ", margin.mae), paste0("Result MAE = ", result.mae),
+             paste0("Brier score ave = ", brier.score.ave), paste0("Log score ave = ", log.score.ave)))
+
+# Games and results of interest: 1994-2016
+games.1994.2016 <- all.games %>% filter(season >= 1994)
+elo.1994.2016 <- all.games.elo.run %>% filter(all.games$season >= 1994)
+elo.1994.2016.rs <- SelectHomeOrAwayValueRandom(elo.1994.2016, c('margin.exp', 'margin.act', 'margin.error'))
+
+fixture <- LoadRoundFixture()
+PredictRound(fixture, 2017, "R14", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
+             param.spread = 400,
+             #param.margin = 0.02395478,
+             #param.coeff.travel = 17.70182, param.power.travel = 0.2377348,
+             param.margin = 0.03213133,
+             param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
+             # param.margin = 0.01375898,
+             # param.coeff.travel = 19.19262, param.power.travel = 0.1026281,
+             con = 'out/afl_elo_pred_2017-R14.txt')
+             # con = stdout())

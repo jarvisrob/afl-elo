@@ -63,6 +63,7 @@ RunElo <- function(all.games, team.dictionary, team.data,
   result.cumulative.abs.error <- 0
   brier.cumulative.error <- 0
   log.score.cumulative.error <- 0
+  margin.cumulative.sq.error <- 0
   
   # Initialise season tracking variable
   season.current <- 1897
@@ -101,6 +102,7 @@ RunElo <- function(all.games, team.dictionary, team.data,
         result.cumulative.abs.error <- 0
         brier.cumulative.error <- 0
         log.score.cumulative.error <- 0
+        margin.cumulative.sq.error <- 0
       }
     
     }
@@ -209,6 +211,7 @@ RunElo <- function(all.games, team.dictionary, team.data,
     result.cumulative.abs.error <- result.cumulative.abs.error + abs(result.exp.home - result.act.home)
     brier.cumulative.error <- brier.cumulative.error + brier.game
     log.score.cumulative.error <- log.score.cumulative.error + log.score.game
+    margin.cumulative.sq.error <- margin.cumulative.sq.error + (margin.act.home - margin.exp.home) ^ 2
   
   }
 
@@ -219,6 +222,7 @@ RunElo <- function(all.games, team.dictionary, team.data,
   elo.result <- list(team.data, rating.time.series,
                      ground.data, all.games.elo,
                      margin.cumulative.abs.error, result.cumulative.abs.error,
-                     brier.cumulative.error, log.score.cumulative.error)
+                     brier.cumulative.error, log.score.cumulative.error,
+                     margin.cumulative.sq.error)
   elo.result
 }

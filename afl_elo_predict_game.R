@@ -46,6 +46,9 @@ PredictRound <- function(fixture, season, rnd,
   txt <- append(txt, "")
 
   writeLines(txt, con)
+  if (con != stdout()) {
+    writeLines(paste0("Round predictions written to file: ", con), stdout())
+  }
 }
 
 

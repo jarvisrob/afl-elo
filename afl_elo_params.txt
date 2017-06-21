@@ -1,0 +1,21 @@
+
+# Optimised using harmony search for Brier score with logistic distribution
+param.margin = 0.02395478,
+param.coeff.rating.update = 76.75845, param.regress.rating = 0.2062030,
+param.coeff.ground.update = 1.653744,
+param.coeff.travel = 17.70182, param.power.travel = 0.2377348,
+param.rating.expansion.init = 1335
+
+# Optimised using harmony search for Brier score with normal distribution
+param.margin = 0.03213133,
+param.coeff.rating.update = 76.72256, param.regress.rating = 0.2038160,
+param.coeff.ground.update = 1.675048,
+param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
+param.rating.expansion.init = 1330
+
+# Optimised using PSO (hydro) for RMSE in margin with normal distribution
+param.margin = 0.01375898,
+param.coeff.rating.update = 64.75447, param.regress.rating = 0.2627962,
+param.coeff.ground.update = 9.455308,
+param.coeff.travel = 19.19262, param.power.travel = 0.1026281,
+param.rating.expansion.init = 1360
