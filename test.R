@@ -14,8 +14,14 @@ source("afl_elo_predict_game.R")
 source("afl_elo_postproc.R")
 source("afl_elo_sim.R")
 
+# Prediction run (all games to today) or testing run (games until end 2016)
+yes.pred.run <- TRUE
+
 # Init
 all.games <- GetAllGames(do.download = TRUE)
+if (!yes.pred.run) {
+  all.games <- all.games %>% filter(season <= 2016)
+}
 all.games.elo <- InitAllGamesElo(all.games)
 team.dictionary <- InitTeamLDictionary()
 team.dictionary.reverse <- InitTeamDictionaryReverse()
@@ -73,12 +79,15 @@ writeLines(c(paste0("Margin RMSE = ", margin.rmse), paste0("Margin MAE = ", marg
              paste0("Brier score ave = ", brier.score.ave), paste0("Log score ave = ", log.score.ave)))
 
 # Games and results of interest: 1994-2016
-games.1994.2016 <- all.games %>% filter(season >= 1994)
-elo.1994.2016 <- all.games.elo.run %>% filter(all.games$season >= 1994)
-elo.1994.2016.rs <- SelectHomeOrAwayValueRandom(elo.1994.2016, c('margin.exp', 'margin.act', 'margin.error'))
+if (!yes.pred.run) {
+  games.1994.2016 <- all.games %>% filter(season >= 1994)
+  elo.1994.2016 <- all.games.elo.run %>% filter(all.games$season >= 1994)
+  elo.1994.2016.rs <- SelectHomeOrAwayValueRandom(elo.1994.2016, c('margin.exp', 'margin.act', 'margin.error'))
+  calib.1994.2016 <- CheckCalibration(elo.1994.2016, 0.05)
+}
 
 fixture <- LoadRoundFixture()
-PredictRound(fixture, 2017, "R14", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
+PredictRound(fixture, 2017, "R15", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
              param.spread = 400,
              #param.margin = 0.02395478,
              #param.coeff.travel = 17.70182, param.power.travel = 0.2377348,
@@ -86,5 +95,5 @@ PredictRound(fixture, 2017, "R14", all.games, team.data.run, ground.data.run, gr
              param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
              # param.margin = 0.01375898,
              # param.coeff.travel = 19.19262, param.power.travel = 0.1026281,
-             con = 'out/afl_elo_pred_2017-R14.txt')
+             con = 'out/afl_elo_pred_2017-R15.txt')
              # con = stdout())
