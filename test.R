@@ -15,7 +15,7 @@ source("afl_elo_postproc.R")
 source("afl_elo_sim.R")
 
 # Prediction run (all games to today) or testing run (games until end 2016)
-yes.pred.run <- TRUE
+yes.pred.run <- FALSE
 
 # Init
 all.games <- GetAllGames(do.download = TRUE)
@@ -84,16 +84,16 @@ if (!yes.pred.run) {
   elo.1994.2016 <- all.games.elo.run %>% filter(all.games$season >= 1994)
   elo.1994.2016.rs <- SelectHomeOrAwayValueRandom(elo.1994.2016, c('margin.exp', 'margin.act', 'margin.error'))
   calib.1994.2016 <- CheckCalibration(elo.1994.2016, 0.05)
+} else {
+  fixture <- LoadRoundFixture()
+  PredictRound(fixture, 2017, "R15", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
+               param.spread = 400,
+               #param.margin = 0.02395478,
+               #param.coeff.travel = 17.70182, param.power.travel = 0.2377348,
+               param.margin = 0.03213133,
+               param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
+               # param.margin = 0.01375898,
+               # param.coeff.travel = 19.19262, param.power.travel = 0.1026281,
+               con = 'out/afl_elo_pred_2017-R15.txt')
+               # con = stdout())
 }
-
-fixture <- LoadRoundFixture()
-PredictRound(fixture, 2017, "R15", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
-             param.spread = 400,
-             #param.margin = 0.02395478,
-             #param.coeff.travel = 17.70182, param.power.travel = 0.2377348,
-             param.margin = 0.03213133,
-             param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
-             # param.margin = 0.01375898,
-             # param.coeff.travel = 19.19262, param.power.travel = 0.1026281,
-             con = 'out/afl_elo_pred_2017-R15.txt')
-             # con = stdout())
