@@ -1,12 +1,12 @@
-# 2017, R15 fixture
+# 2017, R21 fixture
 
 team.home				team.away				ground
-melbourne				sydney					M.C.G.
-western.bulldogs		west.coast.eagles		Docklands
-carlton					adelaide				M.C.G.
-gold.coast				north.melbourne			Carrara
-greater.western.sydney	geelong					"Sydney Showground"
-port.adelaide			richmond				"Adelaide Oval"
-essendon				brisbane.lions			Docklands
-hawthorn				collingwood				M.C.G.
-fremantle				st.kilda				Subiaco
+western.bulldogs		greater.western.sydney	Docklands
+sydney					fremantle				S.C.G.
+geelong					richmond				"Kardinia Park"
+brisbane.lions			gold.coast				Gabba
+essendon				adelaide				Docklands
+west.coast.eagles		carlton					Subiaco
+melbourne				st.kilda				M.C.G.
+hawthorn				north.melbourne			"York Park"
+port.adelaide			collingwood				"Adelaide Oval"

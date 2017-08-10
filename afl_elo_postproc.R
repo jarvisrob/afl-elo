@@ -20,8 +20,10 @@ CheckCalibration <- function(games.elo, bin.width) {
 
   calib <- data.frame(bin.mid = bin.mid, win.frac = win.frac, calib.error = calib.error)
 
-  plot(calib$bin.mid, calib$win.frac)
-  lines(c(0, 1), c(0, 1))
+  # plot(calib$bin.mid, calib$win.frac)
+  # lines(c(0, 1), c(0, 1))
+  p <- ggplot(calib, aes(bin.mid, win.frac)) + geom_point() + geom_abline(intercept = 0, slope = 1)
+  print(p)
 
   calib
 }

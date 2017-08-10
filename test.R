@@ -15,7 +15,7 @@ source("afl_elo_postproc.R")
 source("afl_elo_sim.R")
 
 # Prediction run (all games to today) or testing run (games until end 2016)
-yes.pred.run <- FALSE
+yes.pred.run <- TRUE
 
 # Init
 all.games <- GetAllGames(do.download = TRUE)
@@ -86,7 +86,7 @@ if (!yes.pred.run) {
   calib.1994.2016 <- CheckCalibration(elo.1994.2016, 0.05)
 } else {
   fixture <- LoadRoundFixture()
-  PredictRound(fixture, 2017, "R15", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
+  PredictRound(fixture, 2017, "R21", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
                param.spread = 400,
                #param.margin = 0.02395478,
                #param.coeff.travel = 17.70182, param.power.travel = 0.2377348,
@@ -94,6 +94,6 @@ if (!yes.pred.run) {
                param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
                # param.margin = 0.01375898,
                # param.coeff.travel = 19.19262, param.power.travel = 0.1026281,
-               con = 'out/afl_elo_pred_2017-R15.txt')
+               con = 'out/afl_elo_pred_2017-R21.txt')
                # con = stdout())
 }
