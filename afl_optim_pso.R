@@ -47,21 +47,21 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
                        param.coeff.ground.update,
                        param.coeff.travel, param.power.travel,
                        param.rating.expansion.init,
-                       do.store.detail = FALSE)
+                       do.store.detail = TRUE)
   
   #team.data.run <- elo.result[[1]]
   #rating.time.series.run <- elo.result[[2]]
 
   #ground.panel.record.run <- elo.result[[3]]
-  #all.games.elo.run <- elo.result[[4]]
+  all.games.elo.run <- elo.result[[4]]
 
-  margin.sum.abs.error <- elo.result[[5]]
-  result.sum.abs.error <- elo.result[[6]]
+  # margin.sum.abs.error <- elo.result[[5]]
+  # result.sum.abs.error <- elo.result[[6]]
 
-  brier.cumulative.error <- elo.result[[7]]
-  log.score.cumulative.error <- elo.result[[8]]
+  # brier.cumulative.error <- elo.result[[7]]
+  # log.score.cumulative.error <- elo.result[[8]]
   
-  margin.cumulative.sq.error <- elo.result[[9]]
+  # margin.cumulative.sq.error <- elo.result[[9]]
   
   # margin.mae <- margin.sum.abs.error / sum(all.games$season >= 1994)
   #print(paste0("Margin MAE = ", as.character(margin.mae)))
@@ -87,10 +87,20 @@ OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
   #print("---")
   #output <- list(brier.score = brier.score, margin.mae = margin.mae)
   
-  margin.rmse <- sqrt(margin.cumulative.sq.error / sum(all.games$season >= 1994))
+  # margin.rmse <- sqrt(margin.cumulative.sq.error / sum(all.games$season >= 1994))
 
   # margin.mae
-  margin.rmse
+  # margin.rmse
+  
+  # games.1994.2016 <- all.games %>% filter(season >= 1994)
+  elo.1994.2016 <- all.games.elo.run %>% filter(all.games$season >= 1994)
+  elo.1994.2016.rs <- SelectHomeOrAwayValueRandom(elo.1994.2016, c('margin.exp', 'margin.act', 'margin.error'))
+  
+  margin.error.distrib <- fitdistr(elo.1994.2016.rs$margin.error, 'normal')
+  margin.error.sd <- margin.error.distrib$estimate[["sd"]]
+  
+  err <- abs(margin.error.sd - 1/param.margin)
+  err
 }
 
 
@@ -124,6 +134,7 @@ fixed <- c(1500.0, 400.0)
 #fw.d <- (tunable.params.upper - tunable.params.lower) / 1000
 
 # Data inputs
+all.games <- all.games %>% filter(season <= 2016)
 df.inputs <- list(all.games, team.dictionary, team.data,
                   ground.location, ground.data, travel.distance,
                   rating.time.series, all.games.elo)
@@ -154,7 +165,11 @@ tic()
 
 library(parallel)
 library(hydroPSO)
-pso.result <- hydroPSO(tunable.params.init, OptimWrapperRunElo, fixed.params = fixed, data.inputs = df.inputs, lower = tunable.params.lower, upper = tunable.params.upper, control = list(maxit = 300, npart = 40, parallel = 'parallelWin'))
+library(MASS)
+# library(dplyr)
+pso.result <- hydroPSO(tunable.params.init, OptimWrapperRunElo, fixed.params = fixed, data.inputs = df.inputs, 
+                       lower = tunable.params.lower, upper = tunable.params.upper, 
+                       control = list(maxit = 300, npart = 40, parallel = 'parallelWin', par.pkgs = c("MASS", "dplyr")))
 
 
 toc()

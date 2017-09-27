@@ -2,6 +2,7 @@
 # All distances are in km
 # http://www.travelmath.com/ for flight path distances except for Euroa and Yallourn (not available)
 # Yallourn and Euroa are driving distances using Google Maps
+# Shanghai has been set to zero as was seen as equal travel disadvantage for all teams--but this can (should) be updated
 
 # Rows are ground locations, cols are team locations
 
@@ -21,4 +22,5 @@ Cairns            2317        1957    2120      1389      3444
 Euroa             164         714     748       1516      3423
 Wellington        2578        2228    3226      2506      5272
 Yallourn          143         874     865       1785      3556
-Shanghai		  0			  0		  0			0		  0
+Shanghai		      0	    		  0		    0			    0		      0
+Ballarat          102         781     555       1408      2630

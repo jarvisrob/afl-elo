@@ -2,7 +2,7 @@
 
 
 GetAllGames <- function(file.url = 'http://afltables.com/afl/stats/biglists/bg3.txt',
-                        file.local = 'all_games.txt', do.download = T) {
+                        file.local = 'all_games.txt', do.download = TRUE) {
   
   if (do.download) {
     download.file(file.url, file.local)

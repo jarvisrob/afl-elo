@@ -1,6 +1,5 @@
 
-library(MASS)
-
+library(doAzureParallel)
 
 OptimWrapperRunElo <- function(tunable.params, fixed.params, data.inputs) {
 
@@ -138,6 +137,12 @@ df.inputs <- list(all.games, team.dictionary, team.data,
 # Optimisation call
 source("../stochoptim/harmony_search.R")
 
+# Azure Batch cluser using doAzureParallel
+setCredentials("c:/lab/azure-batch/credentials.json")
+cluster <- makeCluster("c:/lab/azure-batch/cluster.json", fullName = TRUE)
+registerDoAzureParallel(cluster)
+n.par.workers <- getDoParWorkers()
+
 
 tic()
 harm.search.res <- HarmonySearch(OptimWrapperRunElo, fixed.params = fixed, data.inputs = df.inputs,
@@ -149,10 +154,13 @@ harm.search.res <- HarmonySearch(OptimWrapperRunElo, fixed.params = fixed, data.
                                  fw.d = fw.d,
                                  hms = 3, hmcr = 0.9, par = 0.3,
                                  itn.max = 1, minimize = TRUE,
-                                 hm.init = NULL)
+                                 hm.init = NULL,
+                                 f.packages.req = "MASS")
 
 #optim.result <- optim(par = tunable.params.init, OptimWrapperRunElo,
                       #fixed.params = fixed, data.inputs = df.inputs,
                       #method = "L-BFGS-B",
                       #lower = tunable.params.lower, upper = tunable.params.upper)
 toc()
+
+stopCluster(cluster)

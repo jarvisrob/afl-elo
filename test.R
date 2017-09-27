@@ -5,6 +5,7 @@ setwd("C:/Lab/afl-elo")
 #install.packages('tictoc')
 library(tictoc)
 library(tidyverse)
+library(MASS)
 
 # Source
 source('afltables_all_games_prep.R')
@@ -17,8 +18,11 @@ source("afl_elo_sim.R")
 # Prediction run (all games to today) or testing run (games until end 2016)
 yes.pred.run <- TRUE
 
+# Download the list of all games from AFL tables?
+do.download = TRUE
+
 # Init
-all.games <- GetAllGames(do.download = TRUE)
+all.games <- GetAllGames(do.download = do.download)
 if (!yes.pred.run) {
   all.games <- all.games %>% filter(season <= 2016)
 }
@@ -39,21 +43,16 @@ elo.result <- RunElo(all.games, team.dictionary, team.data,
                      ground.location, ground.data, travel.distance,
                      rating.time.series, all.games.elo,
                      param.rating.mean = 1500, param.spread = 400,
-                     #param.margin = 0.02395478,
-                     #param.coeff.rating.update = 76.75845, param.regress.rating = 0.2062030,
-                     #param.coeff.ground.update = 1.653744,
-                     #param.coeff.travel = 17.70182, param.power.travel = 0.2377348,
-                     #param.rating.expansion.init = 1335,
                      param.margin = 0.03213133,
                      param.coeff.rating.update = 76.72256, param.regress.rating = 0.2038160,
                      param.coeff.ground.update = 1.675048,
                      param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
                      param.rating.expansion.init = 1330,
-                     # param.margin = 0.01375898,
-                     # param.coeff.rating.update = 64.75447, param.regress.rating = 0.2627962,
-                     # param.coeff.ground.update = 9.455308,
-                     # param.coeff.travel = 19.19262, param.power.travel = 0.1026281,
-                     # param.rating.expansion.init = 1360,
+                     # param.margin = 0.02595315,
+                     # param.coeff.rating.update = 70.34218, param.regress.rating = 0.1650020,
+                     # param.coeff.ground.update = 2.9224607,
+                     # param.coeff.travel = 20.309501, param.power.travel = 0.2627621,
+                     # param.rating.expansion.init = 1344.266,
                      do.store.detail = TRUE)
 
 toc()
@@ -86,7 +85,7 @@ if (!yes.pred.run) {
   calib.1994.2016 <- CheckCalibration(elo.1994.2016, 0.05)
 } else {
   fixture <- LoadRoundFixture()
-  PredictRound(fixture, 2017, "R21", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
+  PredictRound(fixture, 2017, "PF", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
                param.spread = 400,
                #param.margin = 0.02395478,
                #param.coeff.travel = 17.70182, param.power.travel = 0.2377348,
@@ -94,6 +93,6 @@ if (!yes.pred.run) {
                param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
                # param.margin = 0.01375898,
                # param.coeff.travel = 19.19262, param.power.travel = 0.1026281,
-               con = 'out/afl_elo_pred_2017-R21.txt')
+               con = 'out/afl_elo_pred_2017-PF.txt')
                # con = stdout())
 }
