@@ -16,7 +16,7 @@ source("afl_elo_postproc.R")
 source("afl_elo_sim.R")
 
 # Prediction run (all games to today) or testing run (games until end 2016)
-yes.pred.run <- TRUE
+yes.pred.run <- FALSE
 
 # Download the list of all games from AFL tables?
 do.download = TRUE
@@ -85,7 +85,7 @@ if (!yes.pred.run) {
   calib.1994.2016 <- CheckCalibration(elo.1994.2016, 0.05)
 } else {
   fixture <- LoadRoundFixture()
-  PredictRound(fixture, 2017, "PF", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
+  PredictRound(fixture, 2017, "GF", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
                param.spread = 400,
                #param.margin = 0.02395478,
                #param.coeff.travel = 17.70182, param.power.travel = 0.2377348,

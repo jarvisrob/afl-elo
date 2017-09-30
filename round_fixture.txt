@@ -1,5 +1,4 @@
-# 2017, PF fixture
+# 2017, GF fixture
 
 team.home				team.away				ground
-adelaide				geelong					"Adelaide Oval"
-richmond				greater.western.sydney	M.C.G.
+adelaide				richmond				M.C.G.
