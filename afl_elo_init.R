@@ -11,6 +11,7 @@ InitTeamLDictionary <- function() {
                           'Geelong' = 'geelong',
                           'Gold Coast' = 'gold.coast',
                           'GW Sydney' = 'greater.western.sydney',
+                          "Greater Western Sydney" = "greater.western.sydney",
                           'Hawthorn' = 'hawthorn',
                           'Melbourne' = 'melbourne',
                           'North Melbourne' = 'north.melbourne',
