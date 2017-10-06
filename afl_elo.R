@@ -42,6 +42,65 @@ RegressRating <- function(rating, param.rating.mean, param.regress) {
 }
 
 
+DoGameElo <- function(game.info, 
+                      team.data, 
+                      ground.location, ground.data, travel,distance,
+                      param.spread,
+                      param.margin,
+                      param.coeff.rating.update,
+                      param.coeff.ground.update,
+                      param.coeff.travel, param.power.travel) {
+  
+  # Extract home and away teams, their scores and the ground
+  team.home <- game.info$team.home
+  team.away <- game.info$team.away
+  score.points.home <- game.info$score.points.home
+  score.points.away <- game.info$score.points.away
+  ground <- game.info$ground
+  
+  # Extract team ratings
+  rating.home <- team.data[team.home, 'rating']
+  rating.away <- team.data[team.away, 'rating']
+  
+  # Determine ground adjustments
+  rating.ground.adj.home <- CalculateGroundAdj(team.home, ground, ground.data)
+  rating.ground.adj.away <- CalculateGroundAdj(team.away, ground, ground.data)
+  
+  # Determine travel adjustments
+  rating.travel.adj.home <- CalculateTravelAdj(team.home, ground, team.data, ground.location, travel.distance, param.coeff.travel, param.power.travel)
+  rating.travel.adj.away <- CalculateTravelAdj(team.away, ground, team.data, ground.location, travel.distance, param.coeff.travel, param.power.travel)
+  
+  # Determine adjusted ratings = rating + ground adj + travel adj
+  rating.adj.home <- rating.home + rating.ground.adj.home + rating.travel.adj.home
+  rating.adj.away <- rating.away + rating.ground.adj.away + rating.travel.adj.away
+  
+  # Calculate the difference in adj ratings and the expected result and margin
+  delta.rating.home <- rating.adj.home - rating.adj.away
+  delta.rating.away <- rating.adj.away - rating.adj.home
+  result.exp.home <- CalculateResultExp(delta.rating.home, param.spread)
+  result.exp.away <- 1 - result.exp.home
+  margin.exp.home <- CalculateMarginExp(delta.rating.home, param.spread, param.margin)
+  margin.exp.away <- -margin.exp.home
+  
+  # Determine the actual margin and result
+  margin.act.home <- score.points.home - score.points.away
+  margin.act.away <- score.points.away - score.points.home
+  result.act.home <- CalculateResultAct(margin.act.home, param.margin)
+  result.act.away <- 1 - result.act.home
+  
+  # Calculate the new ratings based on the difference between expected and actual results
+  new.rating.home <- CalculateRatingNew(rating.home, result.exp.home, result.act.home, param.coeff.rating.update)
+  new.rating.away <- CalculateRatingNew(rating.away, result.exp.away, result.act.away, param.coeff.rating.update)
+  
+  # Calculate the new ground ratings based on the difference between expected and actual results
+  new.rating.ground.adj.home <- CalculateRatingNew(rating.ground.adj.home, result.exp.home, result.act.home, param.coeff.ground.update)
+  new.rating.ground.adj.away <- CalculateRatingNew(rating.ground.adj.away, result.exp.away, result.act.away, param.coeff.ground.update)
+  
+  elo.game <- list(new.rating.home = new.rating.home, new.rating.away = new.rating.away,
+                   new.rating.ground.adj.home = new.rating.ground.adj.home, new.rating.ground.adj.away = new.rating.ground.adj.away)
+}
+
+
 RunElo <- function(all.games, team.dictionary, team.data,
                    ground.location, ground.data, travel.distance,
                    rating.time.series, all.games.elo,
