@@ -100,6 +100,22 @@ DoGameElo <- function(game.info,
                    new.rating.ground.adj.home = new.rating.ground.adj.home, new.rating.ground.adj.away = new.rating.ground.adj.away)
 }
 
+UpdateEloRatings <- function(team.data, ground.data, rating.time.series, game.info, elo.game) {
+  team.home <- game.info$team.home
+  team.away <- game.info$team.away
+  ground <- game.info$ground
+  season.round.current <- paste(game.info$season, game.info$round, sep = ' ')
+  team.data[team.home, "rating"] <- elo.game$new.rating.home
+  team.data[team.away, "rating"] <- elo.game$new.rating.away
+  ground.data[ground, team.home] <- elo.game$new.rating.ground.adj.home
+  ground.data[ground, team.away] <- elo.game$new.rating.ground.adj.away
+  rating.time.series[season.round.current, team.home] <- elo.game$new.rating.home
+  rating.time.series[season.round.current, team.away] <- elo.game$new.rating.away
+  
+  elo.data <- list(team.data = team.data, ground.data = ground.data, rating.time.series = rating.time.series)
+  elo.data
+}
+
 
 RunElo <- function(all.games, team.dictionary, team.data,
                    ground.location, ground.data, travel.distance,

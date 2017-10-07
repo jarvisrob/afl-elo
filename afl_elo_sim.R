@@ -36,21 +36,27 @@ SimulateGameScore <- function(margin.exp.home, margin.error.sigma = 38.5, lose.s
   score.sim <- list(margin.home = margin.sim.home, lose = lose.score.sim, points.home = score.points.home, points.away = score.points.away)
 }
 
-SimulateSeasonElo <- function(fixture.season, 
+SimulateSeasonElo <- function(season, fixture.season, 
                               team.data, ground.data, ground.location, travel.distance,
                               margin.error.sigma = 38.5, lose.score.mu = 75.2, lose.score.sigma = 19.2) {
   
+  # !!! NEED TO REGRESS RATINGS BEFORE COMMENCING SEASON SIM !!!
+  
+  
   n.rounds <- max(fixture.season[, "rnd"])
+  
+  txt <- c("")
   
   for (i in 1 : n.rounds) {
     fixture.round <- fixture.season %>% filter(rnd == i)
     n.games <- nrow(fixture.round)
     for (j in 1 : n.games) {
-      game.info <- list()
+      game.info <- list(season = season, rnd = i, game = j)
       game.info$team.home <- team.dictionary[[fixture.round[j, "team.home"]]]
       game.info$team.away <- team.dictionary[[fixture.round[j, "team.away"]]]
       game.info$ground <- fixture.round[j, "ground"]
-      writeLines(paste0("R", i, " G", j, ": ", game.info$team.home, " vs ", game.info$team.away, " at ", game.info$ground))
+      txt <- append(txt, paste0("R", i, " G", j, ": ", game.info$team.home, " vs ", game.info$team.away, " at ", game.info$ground))
+      # writeLines(paste0("R", i, " G", j, ": ", game.info$team.home, " vs ", game.info$team.away, " at ", game.info$ground))
       pred <- PredictGame(game.info$team.home, game.info$team.away, game.info$ground,
                           team.data, ground.data, ground.location, travel.distance, 
                           commission = 0, 
@@ -61,9 +67,14 @@ SimulateSeasonElo <- function(fixture.season,
       game.info$score.points.home <- score.sim$points.home
       game.info$score.points.away <- score.sim$points.away
       
-      writeLines(paste0("rating.home = ", team.data[game.info$team.home, 'rating'], " | rating.away = ", team.data[game.info$team.away, 'rating']))
-      writeLines(paste0("gnd.adj.home = ", CalculateGroundAdj(game.info$team.home, game.info$ground, ground.data), 
-                        " | gnd.adj.away = ", CalculateGroundAdj(game.info$team.away, game.info$ground, ground.data)))
+      txt <- append(txt, paste0("rating.home = ", team.data[game.info$team.home, 'rating'], " | rating.away = ", team.data[game.info$team.away, 'rating']))
+      txt <- append(txt, paste0("gnd.adj.home = ", CalculateGroundAdj(game.info$team.home, game.info$ground, ground.data), 
+                                " | gnd.adj.away = ", CalculateGroundAdj(game.info$team.away, game.info$ground, ground.data)))
+      # writeLines(paste0("rating.home = ", team.data[game.info$team.home, 'rating'], " | rating.away = ", team.data[game.info$team.away, 'rating']))
+      # writeLines(paste0("gnd.adj.home = ", CalculateGroundAdj(game.info$team.home, game.info$ground, ground.data), 
+      #                   " | gnd.adj.away = ", CalculateGroundAdj(game.info$team.away, game.info$ground, ground.data)))
+      
+      txt <- append(txt, paste0("home = ", game.info$score.points.home, " | away = ", game.info$score.points.away))
       
       elo.game <- DoGameElo(game.info, 
                             team.data, 
@@ -74,16 +85,25 @@ SimulateSeasonElo <- function(fixture.season,
                             param.coeff.ground.update = 2.9224607,
                             param.coeff.travel = 17.70182, param.power.travel = 0.2377348)
       
-      writeLines(paste0("new.rating.home = ", elo.game$new.rating.home, " | new.rating.away = ", elo.game$new.rating.away))
-      writeLines(paste0("new.gnd.adj.home = ", elo.game$new.rating.ground.adj.home, " | new.gnd.adj.away = ", elo.game$new.rating.ground.adj.away))
+      elo.data <- UpdateEloRatings(team.data, ground.data, rating.time.series, game.info, elo.game)
+      team.data <- elo.data$team.data
+      ground.data <- elo.data$ground.data
+      rating.time.series <- elo.data$rating.time.series
       
-      writeLines("---")
+      txt <- append(txt, paste0("new.rating.home = ", elo.game$new.rating.home, " | new.rating.away = ", elo.game$new.rating.away))
+      txt <- append(txt, paste0("new.gnd.adj.home = ", elo.game$new.rating.ground.adj.home, " | new.gnd.adj.away = ", elo.game$new.rating.ground.adj.away))
+      
+      # writeLines(paste0("new.rating.home = ", elo.game$new.rating.home, " | new.rating.away = ", elo.game$new.rating.away))
+      # writeLines(paste0("new.gnd.adj.home = ", elo.game$new.rating.ground.adj.home, " | new.gnd.adj.away = ", elo.game$new.rating.ground.adj.away))
+      
+      txt <- append(txt, "---")
+      # writeLines("---")
     }
   }
   
-  # for (i in 1 : n.games) {
-  #   team.home <- fixture.round[i, "team.home"]
-  #   team.away <- fixture.round[i, "team.away"]
-  # }
+  writeLines(txt, "temp_sim_out.txt")
+  
+  sim.data <- list(team.data = team.data, ground.data = ground.data, rating.time.series = rating.time.series)
+  sim.data
 }
 
