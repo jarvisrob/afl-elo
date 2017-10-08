@@ -31,7 +31,7 @@ SimulateGameScore <- function(margin.exp.home, margin.error.sigma = 38.5, lose.s
     score.points.home <- lose.score.sim + margin.sim.home
   }
 
-  writeLines(paste0("margin.home = ", margin.sim.home, " | lose.score = ", lose.score.sim, " | home = ", score.points.home, " | away = ", score.points.away))
+  # writeLines(paste0("margin.home = ", margin.sim.home, " | lose.score = ", lose.score.sim, " | home = ", score.points.home, " | away = ", score.points.away))
 
   score.sim <- list(margin.home = margin.sim.home, lose = lose.score.sim, points.home = score.points.home, points.away = score.points.away)
 }
@@ -39,6 +39,18 @@ SimulateGameScore <- function(margin.exp.home, margin.error.sigma = 38.5, lose.s
 SimulateSeasonElo <- function(season, fixture.season, 
                               team.data, ground.data, ground.location, travel.distance,
                               margin.error.sigma = 38.5, lose.score.mu = 75.2, lose.score.sigma = 19.2) {
+  
+  prem.pts.win <- 4
+  prem.pts.draw <- 2
+  prem.pts.loss <- 0
+  
+  yes.active <- (team.data$season.start <= season) & (team.data$season.end >= season)
+  teams.active <- rownames(team.data[yes.active, ])
+  n.teams <- length(teams.active)
+  zero.vector <- rep(0, n.teams)
+  ladder.data <- data.frame(team = teams.active, played = zero.vector, won = zero.vector, lost = zero.vector, drawn = zero.vector, 
+                            prem.pts = zero.vector, score.for = zero.vector, score.against = zero.vector, percentage = zero.vector,
+                            ladder.posn = zero.vector)
   
   # !!! NEED TO REGRESS RATINGS BEFORE COMMENCING SEASON SIM !!!
   
@@ -98,12 +110,41 @@ SimulateSeasonElo <- function(season, fixture.season,
       
       txt <- append(txt, "---")
       # writeLines("---")
+      
+      yes.team.home.row <- ladder.data$team == game.info$team.home
+      yes.team.away.row <- ladder.data$team == game.info$team.away
+      ladder.data[yes.team.home.row, "played"] <- ladder.data[yes.team.home.row, "played"] + 1
+      ladder.data[yes.team.away.row, "played"] <- ladder.data[yes.team.away.row, "played"] + 1
+      
+      
+      if (game.info$score.points.home > game.info$score.points.away) {
+        ladder.data[yes.team.home.row, "won"] <- ladder.data[yes.team.home.row, "won"] + 1
+        ladder.data[yes.team.home.row, "prem.pts"] <- ladder.data[yes.team.home.row, "prem.pts"] + prem.pts.win
+        ladder.data[yes.team.away.row, "lost"] <- ladder.data[yes.team.away.row, "lost"] + 1
+        ladder.data[yes.team.away.row, "prem.pts"] <- ladder.data[yes.team.away.row, "prem.pts"] + prem.pts.loss
+      } else if (game.info$score.points.home < game.info$score.points.away) {
+        ladder.data[yes.team.home.row, "lost"] <- ladder.data[yes.team.home.row, "lost"] + 1
+        ladder.data[yes.team.home.row, "prem.pts"] <- ladder.data[yes.team.home.row, "prem.pts"] + prem.pts.loss
+        ladder.data[yes.team.away.row, "won"] <- ladder.data[yes.team.away.row, "won"] + 1
+        ladder.data[yes.team.away.row, "prem.pts"] <- ladder.data[yes.team.away.row, "prem.pts"] + prem.pts.win
+      } else {
+        ladder.data[yes.team.home.row, "drawn"] <- ladder.data[yes.team.home.row, "drawn"] + 1
+        ladder.data[yes.team.home.row, "prem.pts"] <- ladder.data[yes.team.home.row, "prem.pts"] + prem.pts.draw
+        ladder.data[yes.team.away.row, "drawn"] <- ladder.data[yes.team.away.row, "drawn"] + 1
+        ladder.data[yes.team.away.row, "prem.pts"] <- ladder.data[yes.team.away.row, "prem.pts"] + prem.pts.draw
+      }
+      ladder.data[yes.team.home.row, "score.for"] <- ladder.data[yes.team.home.row, "score.for"] + game.info$score.points.home
+      ladder.data[yes.team.away.row, "score.for"] <- ladder.data[yes.team.away.row, "score.for"] + game.info$score.points.away
+      ladder.data[yes.team.home.row, "score.against"] <- ladder.data[yes.team.home.row, "score.against"] + game.info$score.points.away
+      ladder.data[yes.team.away.row, "score.against"] <- ladder.data[yes.team.away.row, "score.against"] + game.info$score.points.home
+      ladder.data[, "percentage"] <- ladder.data[, "score.for"] / ladder.data[, "score.against"] * 100
+      
     }
   }
   
   writeLines(txt, "temp_sim_out.txt")
   
-  sim.data <- list(team.data = team.data, ground.data = ground.data, rating.time.series = rating.time.series)
+  sim.data <- list(team.data = team.data, ground.data = ground.data, rating.time.series = rating.time.series, ladder.data = ladder.data)
   sim.data
 }
 
