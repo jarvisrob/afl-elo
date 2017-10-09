@@ -139,10 +139,15 @@ SimulateSeasonElo <- function(season, fixture.season,
       ladder.data[yes.team.away.row, "score.against"] <- ladder.data[yes.team.away.row, "score.against"] + game.info$score.points.home
       ladder.data[, "percentage"] <- ladder.data[, "score.for"] / ladder.data[, "score.against"] * 100
       
+      
     }
   }
   
   writeLines(txt, "temp_sim_out.txt")
+  
+  ladder.order <- with(ladder.data, order(prem.pts, percentage, decreasing = TRUE))
+  ladder.data$ladder.posn[ladder.order] <- seq(1 : nrow(ladder.data))
+  # ladder.data$ladder.posn <- with(ladder.data, order(prem.pts, percentage, decreasing = TRUE))
   
   sim.data <- list(team.data = team.data, ground.data = ground.data, rating.time.series = rating.time.series, ladder.data = ladder.data)
   sim.data
