@@ -166,7 +166,7 @@ SimulateSeasonEloMany <- function(season, fixture.season, n.itns,
                             ladder.posn = integer(), stringsAsFactors = FALSE)
   
   for (itn in 1 : n.itns) {
-    sim.data <- SimulateSeasonElo(season, fixture.season, team.data.run, ground.data.run, ground.location, travel.distance)
+    sim.data <- SimulateSeasonElo(season, fixture.season, team.data, ground.data, ground.location, travel.distance)
     ladder.many <- rbind(ladder.many, cbind(sim.itn = rep(itn, n.teams), sim.data$ladder.data))
   }
   
@@ -174,7 +174,7 @@ SimulateSeasonEloMany <- function(season, fixture.season, n.itns,
 }
 
 # tic()
-# ladder.many <- SimulateSeasonEloMany(2017, fixture.season.2017, 100, team.data.run, ground.data.run, ground.location, travel.distance)
+# ladder.many <- SimulateSeasonEloMany(2017, fixture.season.2017, 5000, team.data.run, ground.data.run, ground.location, travel.distance)
 # toc()
 
 
