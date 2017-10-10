@@ -50,7 +50,7 @@ SimulateSeasonElo <- function(season, fixture.season,
   zero.vector <- rep(0, n.teams)
   ladder.data <- data.frame(team = teams.active, played = zero.vector, won = zero.vector, lost = zero.vector, drawn = zero.vector, 
                             prem.pts = zero.vector, score.for = zero.vector, score.against = zero.vector, percentage = zero.vector,
-                            ladder.posn = zero.vector)
+                            ladder.posn = zero.vector, stringsAsFactors = FALSE)
   
   # !!! NEED TO REGRESS RATINGS BEFORE COMMENCING SEASON SIM !!!
   
@@ -139,17 +139,42 @@ SimulateSeasonElo <- function(season, fixture.season,
       ladder.data[yes.team.away.row, "score.against"] <- ladder.data[yes.team.away.row, "score.against"] + game.info$score.points.home
       ladder.data[, "percentage"] <- ladder.data[, "score.for"] / ladder.data[, "score.against"] * 100
       
+      ladder.order <- with(ladder.data, order(prem.pts, percentage, decreasing = TRUE))
+      ladder.data$ladder.posn[ladder.order] <- seq(1 : nrow(ladder.data))
       
     }
   }
   
-  writeLines(txt, "temp_sim_out.txt")
+  # writeLines(txt, "temp_sim_out.txt")
   
-  ladder.order <- with(ladder.data, order(prem.pts, percentage, decreasing = TRUE))
-  ladder.data$ladder.posn[ladder.order] <- seq(1 : nrow(ladder.data))
-  # ladder.data$ladder.posn <- with(ladder.data, order(prem.pts, percentage, decreasing = TRUE))
+  
   
   sim.data <- list(team.data = team.data, ground.data = ground.data, rating.time.series = rating.time.series, ladder.data = ladder.data)
   sim.data
 }
+
+SimulateSeasonEloMany <- function(season, fixture.season, n.itns,
+                                  team.data, ground.data, ground.location, travel.distance,
+                                  margin.error.sigma = 38.5, lose.score.mu = 75.2, lose.score.sigma = 19.2) {
+  
+  n.rounds <- fixture.season %>% unique() %>% length()
+  n.teams <- append(fixture.season$team.home, fixture.season$team.away) %>% unique() %>% length()
+  
+  ladder.many <- data.frame(sim.itn = integer(),
+                            team = character(), played = integer(), won = integer(), lost = integer(), drawn = integer(), 
+                            prem.pts = integer(), score.for = numeric(), score.against = numeric(), percentage = numeric(),
+                            ladder.posn = integer(), stringsAsFactors = FALSE)
+  
+  for (itn in 1 : n.itns) {
+    sim.data <- SimulateSeasonElo(season, fixture.season, team.data.run, ground.data.run, ground.location, travel.distance)
+    ladder.many <- rbind(ladder.many, cbind(sim.itn = rep(itn, n.teams), sim.data$ladder.data))
+  }
+  
+  ladder.many
+}
+
+# tic()
+# ladder.many <- SimulateSeasonEloMany(2017, fixture.season.2017, 100, team.data.run, ground.data.run, ground.location, travel.distance)
+# toc()
+
 
