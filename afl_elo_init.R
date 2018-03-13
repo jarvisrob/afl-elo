@@ -10,7 +10,9 @@ InitTeamLDictionary <- function() {
                           'Fremantle' = 'fremantle',
                           'Geelong' = 'geelong',
                           'Gold Coast' = 'gold.coast',
+                          "Gold Coast Suns" = "gold.coast",
                           'GW Sydney' = 'greater.western.sydney',
+                          "GWS Giants" = "greater.western.sydney",
                           "Greater Western Sydney" = "greater.western.sydney",
                           'Hawthorn' = 'hawthorn',
                           'Melbourne' = 'melbourne',
@@ -21,8 +23,10 @@ InitTeamLDictionary <- function() {
                           'St Kilda' = 'st.kilda',
                           'South Melbourne' = 'sydney',
                           'Sydney' = 'sydney',
+                          "Sydney Swans" = "sydney",
                           'University' = 'university',
                           'West Coast' = 'west.coast.eagles',
+                          "West Coast Eagles" = "west.coast.eagles",
                           'Footscray' = 'western.bulldogs',
                           'Western Bulldogs' = 'western.bulldogs')
   team.dictionary

@@ -47,4 +47,5 @@
 'York Park'	            Launceston
 'Jiangwan Stadium'		  Shanghai
 "Eureka Stadium"        Ballarat
+"Perth Stadium"         Perth
 
