@@ -2,6 +2,8 @@
 ScrapeAFLTablesSeasonFixture <- function(season) {
   
   # Requires tidyverse and rvest packages to be loaded
+  require(tidyverse)
+  require(rvest)
   
   # Scrapes from AFL Tables website
   base.url <- "https://afltables.com/afl/seas/"

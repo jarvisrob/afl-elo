@@ -2,7 +2,7 @@
 setwd("C:/Lab/afl-elo")
 
 # Load packages
-#install.packages('tictoc')
+install.packages('tictoc')
 library(tictoc)
 library(tidyverse)
 library(MASS)
@@ -15,7 +15,7 @@ source("afl_elo_predict_game.R")
 source("afl_elo_postproc.R")
 source("afl_elo_sim.R")
 
-# Prediction run (all games to today) or testing run (games until end 2016)
+# Prediction run (all games to today) or testing run (games until end 2017)
 yes.pred.run <- FALSE
 
 # Download the list of all games from AFL tables?
@@ -24,7 +24,7 @@ do.download = TRUE
 # Init
 all.games <- GetAllGames(do.download = do.download)
 if (!yes.pred.run) {
-  all.games <- all.games %>% filter(season <= 2016)
+  all.games <- all.games %>% filter(season <= 2017)
 }
 all.games.elo <- InitAllGamesElo(all.games)
 team.dictionary <- InitTeamLDictionary()

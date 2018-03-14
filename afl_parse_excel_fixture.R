@@ -2,6 +2,8 @@
 ParseExcelFixture <- function(excel_file_path, ground_dictionary) {
   
   # Requires readxl package
+  require(tidyverse)
+  require(readxl)
   
   xls_raw <- read_excel(excel_file_path)
   fixture <- xls_raw %>% filter(Home == "H") %>% separate(Round, c("RoundIgnore", "rnd"), sep = " ", convert = TRUE) 
