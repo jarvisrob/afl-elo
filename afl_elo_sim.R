@@ -69,7 +69,7 @@ SimulateSeasonElo <- function(season, fixture.season,
       game.info$team.away <- team.dictionary[[fixture.round[j, "team.away"]]]
       game.info$ground <- fixture.round[j, "ground"]
       txt <- append(txt, paste0("R", i, " G", j, ": ", game.info$team.home, " vs ", game.info$team.away, " at ", game.info$ground))
-      # writeLines(paste0("R", i, " G", j, ": ", game.info$team.home, " vs ", game.info$team.away, " at ", game.info$ground))
+      writeLines(paste0("R", i, " G", j, ": ", game.info$team.home, " vs ", game.info$team.away, " at ", game.info$ground))
       pred <- PredictGame(game.info$team.home, game.info$team.away, game.info$ground,
                           team.data, ground.data, ground.location, travel.distance, 
                           param.spread = 400, 
