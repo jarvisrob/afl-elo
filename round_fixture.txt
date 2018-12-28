@@ -1,4 +1,4 @@
-# 2017, GF fixture
+# 2018, GF fixture
 
-team.home				team.away				ground
-adelaide				richmond				M.C.G.
+team.home				    team.away				ground
+west.coast.eagles   collingwood     M.C.G.

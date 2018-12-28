@@ -69,7 +69,7 @@ SimulateSeasonElo <- function(season, fixture.season,
       game.info$team.away <- team.dictionary[[fixture.round[j, "team.away"]]]
       game.info$ground <- fixture.round[j, "ground"]
       txt <- append(txt, paste0("R", i, " G", j, ": ", game.info$team.home, " vs ", game.info$team.away, " at ", game.info$ground))
-      writeLines(paste0("R", i, " G", j, ": ", game.info$team.home, " vs ", game.info$team.away, " at ", game.info$ground))
+      # writeLines(paste0("R", i, " G", j, ": ", game.info$team.home, " vs ", game.info$team.away, " at ", game.info$ground))
       pred <- PredictGame(game.info$team.home, game.info$team.away, game.info$ground,
                           team.data, ground.data, ground.location, travel.distance, 
                           param.spread = 400, 
@@ -166,9 +166,11 @@ SimulateFinalsElo <- function(ladder.data) {
   
   # Elimination final 1: 5th vs 8th
   this.final <- finals$rnd == "EF1"
-  finals[this.final, "team.home"] <- ladder.data %>% filter(ladder.posn == 5) %>% .[["team"]]
-  finals[this.final, "team.away"] <- ladder.data %>% filter(ladder.posn == 8) %>% .[["team"]]
-  finals[this.final, "ground"] <- team.data[team.home, "home.ground"]
+  team.home <- ladder.data %>% filter(ladder.posn == 5) %>% .[["team"]]
+  team.away <- ladder.data %>% filter(ladder.posn == 8) %>% .[["team"]]
+  finals[this.final, "team.home"] <- team.home
+  finals[this.final, "team.away"] <- team.away
+  finals[this.final, "ground"] <- team.data[team.home, "home.ground"]  #TODO: what if home ground should be something else, e.g. Cats at MCG
   game.info <- finals[this.final, ]
   pred <- PredictGame(game.info$team.home, game.info$team.away, game.info$ground,
                       team.data, ground.data, ground.location, travel.distance, 
@@ -248,7 +250,8 @@ SimulateSeasonEloMany <- function(season, fixture.season, n.itns,
 }
 
 # tic()
-# ladder.many <- SimulateSeasonEloMany(2017, fixture.season.2017, 5000, team.data.run, ground.data.run, ground.location, travel.distance)
+# ladder.many <- SimulateSeasonEloMany(2018, fixture.season, 5000, team.data.run, ground.data.run, ground.location, travel.distance)
 # toc()
+# ladder.many %>% filter(team == "hawthorn") %>% group_by(ladder.posn) %>% count() %>% mutate(p = n/5000) %>% ggplot(aes(ladder.posn, p)) + geom_col()
 
 

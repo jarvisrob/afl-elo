@@ -65,8 +65,8 @@ PredictGame <- function(team.home, team.away, ground,
                         param.coeff.travel = 17.70182, param.power.travel = 0.2377348) {
 
   # debugging print
-  writeLines(paste0(team.home, " ", team.away, " ", ground))
-  str(ground)
+  # writeLines(paste0(team.home, " ", team.away, " ", ground))
+  # str(ground)
   
   # Extract team ratings
   rating.home <- team.data[team.home, 'rating']
