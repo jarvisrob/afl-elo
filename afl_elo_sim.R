@@ -153,46 +153,68 @@ SimulateSeasonElo <- function(season, fixture.season,
   sim.data
 }
 
-SimulateFinalsElo <- function(ladder.data) {
+
+SimulateFinalsGame <- function() {
   
-  finals.rounds <- c("EF1", "EF2", "QF1", "QF2", "SF1", "SF2", "PF1", "PF2", "GF")
-  n.games <- length(finals)
-  
-  zeros.vector <- rep(0, n.games)
-  finals <- data.frame(rnd = finals.rounds, team.home = character(n.games), team.away = character(n.games), ground = character(n.games),
-                       team.home.score = zeros.vector, team.away.score = zeros.vector,
-                       winner = character(n.games), loser = character(n.games))
-  
-  
-  # Elimination final 1: 5th vs 8th
-  this.final <- finals$rnd == "EF1"
-  team.home <- ladder.data %>% filter(ladder.posn == 5) %>% .[["team"]]
-  team.away <- ladder.data %>% filter(ladder.posn == 8) %>% .[["team"]]
   finals[this.final, "team.home"] <- team.home
   finals[this.final, "team.away"] <- team.away
-  finals[this.final, "ground"] <- team.data[team.home, "home.ground"]  #TODO: what if home ground should be something else, e.g. Cats at MCG
+  
+  if (this.final == "GF") {
+    finals[this.final, "ground"] <- "M.C.G."
+  } else {
+    finals[this.final, "ground"] <- team.data[team.home, "home.ground"]  #TODO: what if home ground should be something else, e.g. Cats at MCG
+  }
+  
   game.info <- finals[this.final, ]
-  pred <- PredictGame(game.info$team.home, game.info$team.away, game.info$ground,
-                      team.data, ground.data, ground.location, travel.distance, 
-                      param.spread = 400, 
-                      param.margin = 0.02395478,
-                      param.coeff.travel = 17.70182, param.power.travel = 0.2377348)
+  
+  pred <- 
+    PredictGame(
+      game.info$team.home,
+      game.info$team.away,
+      game.info$ground,
+      team.data, 
+      ground.data, 
+      ground.location, 
+      travel.distance, 
+      param.spread = 400, 
+      param.margin = 0.02395478,
+      param.coeff.travel = 17.70182,
+      param.power.travel = 0.2377348
+    )
+  
   score.sim <- SimulateGameScore(pred$margin.exp.home)
   finals$score.points.home <- score.sim$points.home
   finals$score.points.away <- score.sim$points.away
+  
   game.info <- finals[this.final, ]
-  elo.game <- DoGameElo(game.info, 
-                        team.data, 
-                        ground.location, ground.data, travel,distance,
-                        param.spread = 400,
-                        param.margin = 0.02395478,
-                        param.coeff.rating.update = 70.34218,
-                        param.coeff.ground.update = 2.9224607,
-                        param.coeff.travel = 17.70182, param.power.travel = 0.2377348)
-  elo.data <- UpdateEloRatings(team.data, ground.data, rating.time.series, game.info, elo.game)
+  
+  elo.game <- 
+    DoGameElo(
+      game.info, 
+      team.data, 
+      ground.location, 
+      ground.data, 
+      travel,distance,
+      param.spread = 400,
+      param.margin = 0.02395478,
+      param.coeff.rating.update = 70.34218,
+      param.coeff.ground.update = 2.9224607,
+      param.coeff.travel = 17.70182, 
+      param.power.travel = 0.2377348
+    )
+  
+  elo.data <-
+    UpdateEloRatings(
+      team.data, 
+      ground.data, 
+      rating.time.series, 
+      game.info, elo.game
+    )
+  
   team.data <- elo.data$team.data
   ground.data <- elo.data$ground.data
   rating.time.series <- elo.data$rating.time.series
+  
   if (game.info$score.points.home > game.info$score.points.away) {
     finals[this.final, "winner"] <- team.home
     finals[this.final, "loser"] <- team.away
@@ -203,27 +225,161 @@ SimulateFinalsElo <- function(ladder.data) {
     print("ERROR: Draw")  # TODO: what happens in a draw??? Re-sim, but with different mean, sd, and add extra points to orig score?
   }
   
+}
+
+
+SimulateFinalsElo <- function(ladder.data) {
+  
+  finals.rounds <-
+    c("EF1", "EF2", "QF1", "QF2", "SF1", "SF2", "PF1", "PF2", "GF")
+  n.games <- length(finals.rounds)
+  
+  finals <-
+    data.frame(
+      rnd = finals.rounds,
+      team.home = character(n.games),
+      team.away = character(n.games),
+      ground = character(n.games),
+      team.home.score = rep(0, n.games),
+      team.away.score = rep(0, n.games),
+      winner = character(n.games),
+      loser = character(n.games)
+    )
+  
+  
+  # Elimination final 1: 5th vs 8th
+  this.final <- finals$rnd == "EF1"
+  
+  team.home <-
+    ladder.data %>%
+    filter(ladder.posn == 5) %>%
+    .[["team"]]
+  
+  team.away <- 
+    ladder.data %>% 
+    filter(ladder.posn == 8) %>% 
+    .[["team"]]
+  
+  ??? <- SimulateFinalsGame()
+  
+    
   # Elimination final 2: 6th vs 7th
+  this.final <- finals$rnd == "EF2"
+  
+  team.home <-
+    ladder.data %>%
+    filter(ladder.posn == 6) %>%
+    .[["team"]]
+  
+  team.away <- 
+    ladder.data %>% 
+    filter(ladder.posn == 7) %>% 
+    .[["team"]]
+  
+  ??? <- SimulateFinalsGame()
+  
   # Inputs: game.info (home, away), team.data (so ground can get determined by func)
   #         team.data, ground,data, ground.location, travel.distance
   #         param.* (i.e. all of them, since predicting and elo calculating)
   #         AND any exceptions to ground location, e.g. Cats playing at MCG, GF always at MCG
   
   # Qualifying final 1: 1st vs 4th
+  this.final <- finals$rnd == "QF1"
+  
+  team.home <-
+    ladder.data %>%
+    filter(ladder.posn == 1) %>%
+    .[["team"]]
+  
+  team.away <- 
+    ladder.data %>% 
+    filter(ladder.posn == 4) %>% 
+    .[["team"]]
+  
+  ??? <- SimulateFinalsGame()
   
   # Qualifying final 2: 2nd vs 3rd
+  this.final <- finals$rnd == "QF2"
+  
+  team.home <-
+    ladder.data %>%
+    filter(ladder.posn == 2) %>%
+    .[["team"]]
+  
+  team.away <- 
+    ladder.data %>% 
+    filter(ladder.posn == 3) %>% 
+    .[["team"]]
+  
+  ??? <- SimulateFinalsGame()
+  
   
   # Semi final 1: Loser QF1 vs Winner EF1
-  game.info$team.home <- finals %>% filter(rnd == "QF1") %>% .[["loser"]]
-  game.info$team.away <- finals %>% filter(rnd == "EF1") %>% .[["winner"]]
+  this.final <- finals$rnd == "SF1"
+  
+  game.info$team.home <-
+    finals %>%
+    filter(rnd == "QF1") %>%
+    .[["loser"]]
+  
+  game.info$team.away <-
+    finals %>% 
+    filter(rnd == "EF1") %>%
+    .[["winner"]]
   
   # Semi final 2: Loser QF2 vs Winner EF2
+  this.final <- finals$rnd == "SF2"
+  
+  game.info$team.home <-
+    finals %>%
+    filter(rnd == "QF2") %>%
+    .[["loser"]]
+  
+  game.info$team.away <-
+    finals %>% 
+    filter(rnd == "EF2") %>%
+    .[["winner"]]
+  
   
   # Preliminary final 1: Winner QF1 vs Winner SF2
+  this.final <- finals$rnd == "PF1"
   
-  # Preliminary final 2: Winner Winner QF2 vs Winner SF1
+  game.info$team.home <-
+    finals %>%
+    filter(rnd == "QF1") %>%
+    .[["winner"]]
+  
+  game.info$team.away <-
+    finals %>% 
+    filter(rnd == "SF2") %>%
+    .[["winner"]]
+  
+  
+  # Preliminary final 2: Winner QF2 vs Winner SF1
+  this.final <- finals$rnd == "PF2"
+  
+  game.info$team.home <-
+    finals %>%
+    filter(rnd == "QF2") %>%
+    .[["winner"]]
+  
+  game.info$team.away <-
+    finals %>% 
+    filter(rnd == "SF1") %>%
+    .[["winner"]]
   
   # Grand final: Winner PF1 vs Winner PF2 (MCG)
+  this.final <- finals$rnd == "GF"
+  
+  game.info$team.home <-
+    finals %>%
+    filter(rnd == "PF1") %>%
+    .[["winner"]]
+  
+  game.info$team.away <-
+    finals %>% 
+    filter(rnd == "PF2") %>%
+    .[["winner"]]
   
 }
 
