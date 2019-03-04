@@ -36,9 +36,18 @@ SimulateGameScore <- function(margin.exp.home, margin.error.sigma = 38.5, lose.s
   score.sim <- list(margin.home = margin.sim.home, lose = lose.score.sim, points.home = score.points.home, points.away = score.points.away)
 }
 
-SimulateSeasonElo <- function(season, fixture.season, 
-                              team.data, ground.data, ground.location, travel.distance,
-                              margin.error.sigma = 38.5, lose.score.mu = 75.2, lose.score.sigma = 19.2) {
+SimulateSeasonElo <-
+  function(
+    season,
+    fixture.season, 
+    team.data,
+    ground.data,
+    ground.location,
+    travel.distance,
+    margin.error.sigma = 38.5, 
+    lose.score.mu = 75.2, 
+    lose.score.sigma = 19.2
+  ) {
   
   prem.pts.win <- 4
   prem.pts.draw <- 2
@@ -52,7 +61,7 @@ SimulateSeasonElo <- function(season, fixture.season,
                             prem.pts = zero.vector, score.for = zero.vector, score.against = zero.vector, percentage = zero.vector,
                             ladder.posn = zero.vector, stringsAsFactors = FALSE)
   
-  # !!! NEED TO REGRESS RATINGS BEFORE COMMENCING SEASON SIM !!!
+  # TODO: !!! NEED TO REGRESS RATINGS BEFORE COMMENCING SEASON SIM !!!
   # BUt only do so if simualting from season start
   
   
@@ -68,45 +77,47 @@ SimulateSeasonElo <- function(season, fixture.season,
       game.info$team.home <- team.dictionary[[fixture.round[j, "team.home"]]]
       game.info$team.away <- team.dictionary[[fixture.round[j, "team.away"]]]
       game.info$ground <- fixture.round[j, "ground"]
-      txt <- append(txt, paste0("R", i, " G", j, ": ", game.info$team.home, " vs ", game.info$team.away, " at ", game.info$ground))
+  
       # writeLines(paste0("R", i, " G", j, ": ", game.info$team.home, " vs ", game.info$team.away, " at ", game.info$ground))
-      pred <- PredictGame(game.info$team.home, game.info$team.away, game.info$ground,
-                          team.data, ground.data, ground.location, travel.distance, 
-                          param.spread = 400, 
-                          param.margin = 0.02395478,
-                          param.coeff.travel = 17.70182, param.power.travel = 0.2377348)
-      score.sim <- SimulateGameScore(pred$margin.exp.home)
-      game.info$score.points.home <- score.sim$points.home
-      game.info$score.points.away <- score.sim$points.away
       
+      ??? <- SimulateGame()
+      
+      # pred <- PredictGame(game.info$team.home, game.info$team.away, game.info$ground,
+      #                     team.data, ground.data, ground.location, travel.distance, 
+      #                     param.spread = 400, 
+      #                     param.margin = 0.02395478,
+      #                     param.coeff.travel = 17.70182, param.power.travel = 0.2377348)
+      # score.sim <- SimulateGameScore(pred$margin.exp.home)
+      # game.info$score.points.home <- score.sim$points.home
+      # game.info$score.points.away <- score.sim$points.away
+      # 
+      # # writeLines(paste0("rating.home = ", team.data[game.info$team.home, 'rating'], " | rating.away = ", team.data[game.info$team.away, 'rating']))
+      # # writeLines(paste0("gnd.adj.home = ", CalculateGroundAdj(game.info$team.home, game.info$ground, ground.data), 
+      # #                   " | gnd.adj.away = ", CalculateGroundAdj(game.info$team.away, game.info$ground, ground.data)))
+      # 
+      # elo.game <- DoGameElo(game.info, 
+      #                       team.data, 
+      #                       ground.location, ground.data, travel,distance,
+      #                       param.spread = 400,
+      #                       param.margin = 0.02395478,
+      #                       param.coeff.rating.update = 70.34218,
+      #                       param.coeff.ground.update = 2.9224607,
+      #                       param.coeff.travel = 17.70182, param.power.travel = 0.2377348)
+      # 
+      # elo.data <- UpdateEloRatings(team.data, ground.data, rating.time.series, game.info, elo.game)
+      # team.data <- elo.data$team.data
+      # ground.data <- elo.data$ground.data
+      # rating.time.series <- elo.data$rating.time.series
+
+      txt <- append(txt, paste0("R", i, " G", j, ": ", game.info$team.home, " vs ", game.info$team.away, " at ", game.info$ground))
       txt <- append(txt, paste0("rating.home = ", team.data[game.info$team.home, 'rating'], " | rating.away = ", team.data[game.info$team.away, 'rating']))
       txt <- append(txt, paste0("gnd.adj.home = ", CalculateGroundAdj(game.info$team.home, game.info$ground, ground.data), 
                                 " | gnd.adj.away = ", CalculateGroundAdj(game.info$team.away, game.info$ground, ground.data)))
-      # writeLines(paste0("rating.home = ", team.data[game.info$team.home, 'rating'], " | rating.away = ", team.data[game.info$team.away, 'rating']))
-      # writeLines(paste0("gnd.adj.home = ", CalculateGroundAdj(game.info$team.home, game.info$ground, ground.data), 
-      #                   " | gnd.adj.away = ", CalculateGroundAdj(game.info$team.away, game.info$ground, ground.data)))
       
       txt <- append(txt, paste0("home = ", game.info$score.points.home, " | away = ", game.info$score.points.away))
-      
-      elo.game <- DoGameElo(game.info, 
-                            team.data, 
-                            ground.location, ground.data, travel,distance,
-                            param.spread = 400,
-                            param.margin = 0.02395478,
-                            param.coeff.rating.update = 70.34218,
-                            param.coeff.ground.update = 2.9224607,
-                            param.coeff.travel = 17.70182, param.power.travel = 0.2377348)
-      
-      elo.data <- UpdateEloRatings(team.data, ground.data, rating.time.series, game.info, elo.game)
-      team.data <- elo.data$team.data
-      ground.data <- elo.data$ground.data
-      rating.time.series <- elo.data$rating.time.series
-      
+            
       txt <- append(txt, paste0("new.rating.home = ", elo.game$new.rating.home, " | new.rating.away = ", elo.game$new.rating.away))
       txt <- append(txt, paste0("new.gnd.adj.home = ", elo.game$new.rating.ground.adj.home, " | new.gnd.adj.away = ", elo.game$new.rating.ground.adj.away))
-      
-      # writeLines(paste0("new.rating.home = ", elo.game$new.rating.home, " | new.rating.away = ", elo.game$new.rating.away))
-      # writeLines(paste0("new.gnd.adj.home = ", elo.game$new.rating.ground.adj.home, " | new.gnd.adj.away = ", elo.game$new.rating.ground.adj.away))
       
       txt <- append(txt, "---")
       # writeLines("---")
@@ -149,12 +160,30 @@ SimulateSeasonElo <- function(season, fixture.season,
   
   
   
-  sim.data <- list(team.data = team.data, ground.data = ground.data, rating.time.series = rating.time.series, ladder.data = ladder.data)
-  sim.data
+  sim.data <- 
+    list(
+      team.data = team.data, 
+      ground.data = ground.data, 
+      rating.time.series = rating.time.series, 
+      ladder.data = ladder.data
+    )
+  
 }
 
 
-SimulateFinalsGame <- function() {
+
+SetupRegularSeasonGame <- function() {
+  
+  game.info$team.home <- team.dictionary[[fixture.round[j, "team.home"]]]
+  game.info$team.away <- team.dictionary[[fixture.round[j, "team.away"]]]
+  game.info$ground <- fixture.round[j, "ground"]
+  
+  game.info
+  
+}
+
+
+SetupFinalsGame <- function() {
   
   finals[this.final, "team.home"] <- team.home
   finals[this.final, "team.away"] <- team.away
@@ -166,6 +195,100 @@ SimulateFinalsGame <- function() {
   }
   
   game.info <- finals[this.final, ]
+  
+  result <- list(game.info = game.info, finals = finals)
+  
+}
+
+
+ProcessOutputsRegularSeasonGame <- function() {
+  
+  yes.team.home.row <- ladder.data$team == game.info$team.home
+  yes.team.away.row <- ladder.data$team == game.info$team.away
+  
+  ladder.data[yes.team.home.row, "played"] <- 
+    ladder.data[yes.team.home.row, "played"] + 1
+  ladder.data[yes.team.away.row, "played"] <- 
+    ladder.data[yes.team.away.row, "played"] + 1
+  
+  if (game.info$score.points.home > game.info$score.points.away) {
+    ladder.data[yes.team.home.row, "won"] <- 
+      ladder.data[yes.team.home.row, "won"] + 1
+    ladder.data[yes.team.home.row, "prem.pts"] <- 
+      ladder.data[yes.team.home.row, "prem.pts"] + prem.pts.win
+    ladder.data[yes.team.away.row, "lost"] <- 
+      ladder.data[yes.team.away.row, "lost"] + 1
+    ladder.data[yes.team.away.row, "prem.pts"] <-
+      ladder.data[yes.team.away.row, "prem.pts"] + prem.pts.loss
+    
+  } else if (game.info$score.points.home < game.info$score.points.away) {
+    ladder.data[yes.team.home.row, "lost"] <-
+      ladder.data[yes.team.home.row, "lost"] + 1
+    ladder.data[yes.team.home.row, "prem.pts"] <-
+      ladder.data[yes.team.home.row, "prem.pts"] + prem.pts.loss
+    ladder.data[yes.team.away.row, "won"] <- 
+      ladder.data[yes.team.away.row, "won"] + 1
+    ladder.data[yes.team.away.row, "prem.pts"] <-
+      ladder.data[yes.team.away.row, "prem.pts"] + prem.pts.win
+    
+  } else {
+    ladder.data[yes.team.home.row, "drawn"] <- 
+      ladder.data[yes.team.home.row, "drawn"] + 1
+    ladder.data[yes.team.home.row, "prem.pts"] <- 
+      ladder.data[yes.team.home.row, "prem.pts"] + prem.pts.draw
+    ladder.data[yes.team.away.row, "drawn"] <- 
+      ladder.data[yes.team.away.row, "drawn"] + 1
+    ladder.data[yes.team.away.row, "prem.pts"] <-
+      ladder.data[yes.team.away.row, "prem.pts"] + prem.pts.draw
+    
+  }
+  
+  ladder.data[yes.team.home.row, "score.for"] <-
+    ladder.data[yes.team.home.row, "score.for"] + game.info$score.points.home
+  ladder.data[yes.team.away.row, "score.for"] <- 
+    ladder.data[yes.team.away.row, "score.for"] + game.info$score.points.away
+  
+  ladder.data[yes.team.home.row, "score.against"] <- 
+    ladder.data[yes.team.home.row, "score.against"] +
+    game.info$score.points.away
+  ladder.data[yes.team.away.row, "score.against"] <- 
+    ladder.data[yes.team.away.row, "score.against"] + 
+    game.info$score.points.home
+  
+  ladder.data[, "percentage"] <-
+    ladder.data[, "score.for"] / ladder.data[, "score.against"] * 100
+  
+  ladder.order <-
+    with(ladder.data, order(prem.pts, percentage, decreasing = TRUE))
+  ladder.data$ladder.posn[ladder.order] <- seq(1 : nrow(ladder.data))
+  
+  ladder.data
+  
+}
+
+
+ProcessOutputsFinalsGame <- function() {
+  
+  if (game.info$score.points.home > game.info$score.points.away) {
+    finals[this.final, "winner"] <- team.home
+    finals[this.final, "loser"] <- team.away
+    
+  } else if (game.info$score.points.away > score.points.home) {
+    finals[this.final, "winner"] <- team.away
+    finals[this.final, "loser"] <- team.home
+    
+  } else {
+    print("ERROR: Draw")  # TODO: what happens in a draw??? Re-sim, but with different mean, sd, and add extra points to orig score?
+  
+  }
+  
+  finals
+  
+}
+
+
+
+SimulateGame <- function() {
   
   pred <- 
     PredictGame(
@@ -183,10 +306,10 @@ SimulateFinalsGame <- function() {
     )
   
   score.sim <- SimulateGameScore(pred$margin.exp.home)
-  finals$score.points.home <- score.sim$points.home
-  finals$score.points.away <- score.sim$points.away
+  !!! finals$score.points.home <- score.sim$points.home
+  !!! finals$score.points.away <- score.sim$points.away
   
-  game.info <- finals[this.final, ]
+  !!! game.info <- finals[this.final, ]
   
   elo.game <- 
     DoGameElo(
@@ -215,15 +338,16 @@ SimulateFinalsGame <- function() {
   ground.data <- elo.data$ground.data
   rating.time.series <- elo.data$rating.time.series
   
-  if (game.info$score.points.home > game.info$score.points.away) {
-    finals[this.final, "winner"] <- team.home
-    finals[this.final, "loser"] <- team.away
-  } else if (game.info$score.points.away > score.points.home) {
-    finals[this.final, "winner"] <- team.away
-    finals[this.final, "loser"] <- team.home
-  } else {
-    print("ERROR: Draw")  # TODO: what happens in a draw??? Re-sim, but with different mean, sd, and add extra points to orig score?
-  }
+  result <-
+    list(
+      pred = pred,
+      score.sim = score.sim,
+      elo.game = elo.game,
+      elo.data = elo.data,
+      team.data = team.data,
+      ground.data = ground.data,
+      rating.time.series = rating.time.series
+    )
   
 }
 
@@ -368,6 +492,7 @@ SimulateFinalsElo <- function(ladder.data) {
     filter(rnd == "SF1") %>%
     .[["winner"]]
   
+  
   # Grand final: Winner PF1 vs Winner PF2 (MCG)
   this.final <- finals$rnd == "GF"
   
@@ -381,6 +506,9 @@ SimulateFinalsElo <- function(ladder.data) {
     filter(rnd == "PF2") %>%
     .[["winner"]]
   
+  ??? <- SimulateFinalsGame()
+  
+  finals, elo.data
 }
 
 
