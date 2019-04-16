@@ -4,7 +4,14 @@ CalculateGroundAdj <- function(team, ground, ground.data) {
   ground.adj
 }
 
-CalculateTravelAdj <- function(team, ground, team.data, ground.location, travel.distance, param.coeff.travel, param.power.travel) {
+CalculateTravelAdj <- function(team, 
+                               ground, 
+                               team.data,
+                               ground.location,
+                               travel.distance,
+                               param.coeff.travel,
+                               param.power.travel) {
+  
   team.location <- team.data[team, 'location']
   distance <- travel.distance[ground.location[ground, ], team.location]
   
@@ -22,13 +29,13 @@ CalculateResultExp <- function(delta.ratings, param.spread) {
 
 CalculateMarginExp <- function(delta.ratings, param.spread, param.margin) {
   #margin.exp <- delta.ratings / (param.margin * param.spread)
-  margin.exp <- delta.ratings / (param.margin * param.spread / 2 * sqrt(2)) # CHECK THIS!!! Works, but need to do maths...
+  margin.exp <- delta.ratings / (param.margin * param.spread / 2 * sqrt(2)) # TODO CHECK THIS!!! Works, but need to do maths...
 }
 
 
 CalculateResultAct <- function(margin.act, param.margin) {
   #result.act <- 1 / (10 ^ (-param.margin * margin.act) + 1)
-  result.act <- pnorm(param.margin * margin.act, mean = 0, sd = 1) # CHECK THIS!!! Works, but need to do maths...
+  result.act <- pnorm(param.margin * margin.act, mean = 0, sd = 1) # TODO CHECK THIS!!! Works, but need to do maths...
 }
 
 
@@ -38,18 +45,22 @@ CalculateRatingNew <- function(rating, result.exp, result.act, param.coeff.updat
 
 
 RegressRating <- function(rating, param.rating.mean, param.regress) {
-  rating.new <- ((1 - param.regress) * rating) + (param.regress * param.rating.mean)
+  rating.new <- 
+    ((1 - param.regress) * rating) + (param.regress * param.rating.mean)
 }
 
 
 DoGameElo <- function(game.info, 
                       team.data, 
-                      ground.location, ground.data, travel,distance,
+                      ground.location, 
+                      ground.data, 
+                      travel,distance,
                       param.spread,
                       param.margin,
                       param.coeff.rating.update,
                       param.coeff.ground.update,
-                      param.coeff.travel, param.power.travel) {
+                      param.coeff.travel, 
+                      param.power.travel) {
   
   # Extract home and away teams, their scores and the ground
   team.home <- game.info$team.home
@@ -100,7 +111,12 @@ DoGameElo <- function(game.info,
                    new.rating.ground.adj.home = new.rating.ground.adj.home, new.rating.ground.adj.away = new.rating.ground.adj.away)
 }
 
-UpdateEloRatings <- function(team.data, ground.data, rating.time.series, game.info, elo.game) {
+UpdateEloRatings <- function(team.data, 
+                             ground.data, 
+                             rating.time.series,
+                             game.info, 
+                             elo.game) {
+  
   team.home <- game.info$team.home
   team.away <- game.info$team.away
   ground <- game.info$ground
@@ -117,14 +133,22 @@ UpdateEloRatings <- function(team.data, ground.data, rating.time.series, game.in
 }
 
 
-RunElo <- function(all.games, team.dictionary, team.data,
-                   ground.location, ground.data, travel.distance,
-                   rating.time.series, all.games.elo,
-                   param.rating.mean, param.spread,
+RunElo <- function(all.games, 
+                   team.dictionary,
+                   team.data,
+                   ground.location,
+                   ground.data, 
+                   travel.distance,
+                   rating.time.series, 
+                   all.games.elo,
+                   param.rating.mean, 
+                   param.spread,
                    param.margin,
-                   param.coeff.rating.update, param.regress.rating,
+                   param.coeff.rating.update,
+                   param.regress.rating,
                    param.coeff.ground.update,
-                   param.coeff.travel, param.power.travel,
+                   param.coeff.travel,
+                   param.power.travel,
                    param.rating.expansion.init,
                    do.store.detail = FALSE) {
   
@@ -169,6 +193,15 @@ RunElo <- function(all.games, team.dictionary, team.data,
       # Move the Swans to Sydney in 1982
       if ((team.data['sydney', 'location'] != 'Sydney') & (season.current >= 1982)) {
         team.data['sydney', 'location'] <- 'Sydney'
+      }
+      
+      # Change the home ground of West Coast Eagles and Fremantle to 
+      # Perth Stadium in 2018
+      if ((team.data['west.coast.eagles', 'home.ground'] != 'Perth Stadium') & (season.current >= 2018)) {
+        team.data['west.coast.eagles', 'home.ground'] <- 'Perth Stadium'
+      }
+      if ((team.data['fremantle', 'home.ground'] != 'Perth Stadium') & (season.current >= 2018)) {
+        team.data['fremantle', 'home.ground'] <- 'Perth Stadium'
       }
 
       # Start calibration/optimisation for 1994 season

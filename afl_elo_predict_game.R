@@ -57,12 +57,18 @@ LoadRoundFixture <- function(file.name = "round_fixture.txt") {
 }
 
 
-PredictGame <- function(team.home, team.away, ground,
-                        team.data, ground.data, ground.location, travel.distance, 
+PredictGame <- function(team.home, 
+                        team.away,
+                        ground,
+                        team.data,
+                        ground.data, 
+                        ground.location, 
+                        travel.distance, 
                         commission = 0, 
                         param.spread = 400, 
                         param.margin = 0.02395478,
-                        param.coeff.travel = 17.70182, param.power.travel = 0.2377348) {
+                        param.coeff.travel = 17.70182, 
+                        param.power.travel = 0.2377348) {
 
   # debugging print
   # writeLines(paste0(team.home, " ", team.away, " ", ground))
@@ -99,42 +105,53 @@ PredictGame <- function(team.home, team.away, ground,
   lay.exchange.home <- (1 / result.exp.home - 1) * (1 - commission) + 1
   lay.exchange.away <- (1 / result.exp.away - 1) * (1 - commission) + 1
 
-  ## Print details
-  #print(paste0("HOME | Rating = ", as.character(round(rating.home, 1)),
-               #" | Ground adj = ", as.character(round(rating.ground.adj.home, 1)),
-               #" | Travel adj = ", as.character(round(rating.travel.adj.home, 1)),
-               #" | Adj rating = ", as.character(round(rating.home.adj, 1))))
-  #print(paste0("     | p = ", as.character(round(result.exp.home * 100, 1)), " per cent"))
-  #print(paste0("     | Bookie:   Back > ", round(back.bookie.home, 2)))
-  #print(paste0("     | Exchange: Back > ", round(back.exchange.home, 2),
-               #" and/or Lay < ", round(lay.exchange.home, 2)))
-  #print(paste0("AWAY | Rating = ", as.character(round(rating.away, 1)),
-               #" | Ground adj = ", as.character(round(rating.ground.adj.away, 1)),
-               #" | Travel adj = ", as.character(round(rating.travel.adj.away, 1)),
-               #" | Adj rating = ", as.character(round(rating.away.adj, 1))))
-  #print(paste0("     | p = ", as.character(round(result.exp.away * 100, 1)), " per cent"))
-  #print(paste0("     | Bookie:   Back > ", round(back.bookie.away, 2)))
-  #print(paste0("     | Exchange: Back > ", round(back.exchange.away, 2),
-               #" and/or Lay < ", round(lay.exchange.away, 2)))
+  # # Print details
+  # print(paste0(team.home, " vs ", team.away, " ---"))
+  # print(paste0("HOME | Rating = ", as.character(round(rating.home, 1)),
+  # " | Ground adj = ", as.character(round(rating.ground.adj.home, 1)),
+  # " | Travel adj = ", as.character(round(rating.travel.adj.home, 1)),
+  # " | Adj rating = ", as.character(round(rating.home.adj, 1))))
+  # print(paste0("     | p = ", as.character(round(result.exp.home * 100, 1)), " per cent"))
+  # print(paste0("     | Bookie:   Back > ", round(back.bookie.home, 2)))
+  # print(paste0("     | Exchange: Back > ", round(back.exchange.home, 2),
+  # " and/or Lay < ", round(lay.exchange.home, 2)))
+  # print(paste0("AWAY | Rating = ", as.character(round(rating.away, 1)),
+  # " | Ground adj = ", as.character(round(rating.ground.adj.away, 1)),
+  # " | Travel adj = ", as.character(round(rating.travel.adj.away, 1)),
+  # " | Adj rating = ", as.character(round(rating.away.adj, 1))))
+  # print(paste0("     | p = ", as.character(round(result.exp.away * 100, 1)), " per cent"))
+  # print(paste0("     | Bookie:   Back > ", round(back.bookie.away, 2)))
+  # print(paste0("     | Exchange: Back > ", round(back.exchange.away, 2),
+  # " and/or Lay < ", round(lay.exchange.away, 2)))
     
   # Return prediction
-  prediction <- list(team.home = team.home, team.away = team.away, ground = ground,
-                     rating.home = rating.home,
-                     rating.ground.adj.home = rating.ground.adj.home,
-                     rating.travel.adj.home = rating.travel.adj.home,
-                     rating.home.adj = rating.home.adj,
-                     rating.away = rating.away,
-                     rating.ground.adj.away = rating.ground.adj.away,
-                     rating.travel.adj.away = rating.travel.adj.away,
-                     rating.away.adj = rating.away.adj,
-                     delta.home = delta.ratings,
-                     delta.away = -delta.ratings,
-                     result.exp.home = result.exp.home, result.exp.away = result.exp.away,
-                     margin.exp.home = margin.exp.home, margin.exp.away = margin.exp.away,
-                     back.bookie.home = back.bookie.home, back.bookie.away = back.bookie.away,
-                     back.exchange.home = back.exchange.home, lay.exchange.home = lay.exchange.home,
-                     back.exchange.away = back.exchange.away, lay.exchange.away = lay.exchange.away,
-                     commission = commission)
+  prediction <- 
+    list(
+      team.home = team.home, 
+      team.away = team.away,
+      ground = ground,
+      rating.home = rating.home,
+      rating.ground.adj.home = rating.ground.adj.home,
+      rating.travel.adj.home = rating.travel.adj.home,
+      rating.home.adj = rating.home.adj,
+      rating.away = rating.away,
+      rating.ground.adj.away = rating.ground.adj.away,
+      rating.travel.adj.away = rating.travel.adj.away,
+      rating.away.adj = rating.away.adj,
+      delta.home = delta.ratings,
+      delta.away = -delta.ratings,
+      result.exp.home = result.exp.home, 
+      result.exp.away = result.exp.away,
+      margin.exp.home = margin.exp.home,
+      margin.exp.away = margin.exp.away,
+      back.bookie.home = back.bookie.home, 
+      back.bookie.away = back.bookie.away,
+      back.exchange.home = back.exchange.home, 
+      lay.exchange.home = lay.exchange.home,
+      back.exchange.away = back.exchange.away, 
+      lay.exchange.away = lay.exchange.away,
+      commission = commission
+    )
 
   prediction
 

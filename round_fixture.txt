@@ -1,4 +1,12 @@
-# 2018, GF fixture
+# 2019, R4 fixture
 
-team.home				    team.away				ground
-west.coast.eagles   collingwood     M.C.G.
+team.home                 team.away                 ground
+sydney                    melbourne                 S.C.G.
+collingwood               western.bulldogs          M.C.G.
+geelong                   greater.western.sydney    "Kardinia Park"
+essendon                  brisbane.lions            M.C.G.
+port.adelaide             richmond                  "Adelaide Oval"
+north.melbourne           adelaide                  Docklands
+west.coast.eagles         fremantle                 "Perth Stadium"
+gold.coast                carlton                   Carrara
+st.kilda                  hawthorn                  Docklands

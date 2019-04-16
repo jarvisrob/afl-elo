@@ -28,8 +28,10 @@
 'Moorabbin Oval'	      Melbourne
 'North Hobart'	        Hobart
 'Olympic Park'	        Melbourne
+"Perth Stadium"         Perth
 'Princes Park'	        Melbourne
 'Punt Rd'	              Melbourne
+"Riverway Stadium"      Townsville
 'S.C.G.'	              Sydney
 'Stadium Australia'	    Sydney
 'Subiaco'	              Perth
@@ -47,5 +49,4 @@
 'York Park'	            Launceston
 'Jiangwan Stadium'		  Shanghai
 "Eureka Stadium"        Ballarat
-"Perth Stadium"         Perth
 

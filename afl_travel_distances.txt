@@ -24,3 +24,4 @@ Wellington        2578        2228    3226      2506      5272
 Yallourn          143         874     865       1785      3556
 Shanghai		      0	    		  0		    0			    0		      0
 Ballarat          102         781     555       1408      2630
+Townsville        2065        1679    1917      1112      3397
