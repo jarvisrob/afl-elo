@@ -691,6 +691,7 @@ SimulateFullSeasonElo <- function(season,
   result <-
     list(
       finals = finals,
+      ladder.data = ladder.data,
       team.data = team.data,
       ground.data = ground.data,
       rating.time.series = rating.time.series
@@ -698,37 +699,116 @@ SimulateFullSeasonElo <- function(season,
 }
 
 
-SimulateSeasonEloMany <- function(season, 
-                                  fixture.season, 
-                                  n.itns,
-                                  team.data, 
-                                  ground.data, 
-                                  ground.location,
-                                  travel.distance,
-                                  rating.time.series,
-                                  margin.error.sigma = 38.5,
-                                  lose.score.mu = 75.2,
-                                  lose.score.sigma = 19.2) {
+SimulateFullSeasonEloMany <- function(season, 
+                                      fixture.season, 
+                                      n.itns,
+                                      team.data, 
+                                      ground.data, 
+                                      ground.location,
+                                      team.dictionary,
+                                      travel.distance,
+                                      elo.params,
+                                      rating.time.series,
+                                      margin.error.sigma = 38.5,
+                                      lose.score.mu = 75.2,
+                                      lose.score.sigma = 19.2) {
   
-  n.rounds <- fixture.season %>% unique() %>% length()
-  n.teams <- append(fixture.season$team.home, fixture.season$team.away) %>% unique() %>% length()
+  # n.rounds <- fixture.season %>% unique() %>% length()
+  n.teams <- 
+    append(fixture.season$team.home, fixture.season$team.away) %>% 
+      unique() %>% 
+      length()
   
-  ladder.many <- data.frame(sim.itn = integer(),
-                            team = character(), played = integer(), won = integer(), lost = integer(), drawn = integer(), 
-                            prem.pts = integer(), score.for = numeric(), score.against = numeric(), percentage = numeric(),
-                            ladder.posn = integer(), stringsAsFactors = FALSE)
+  n.finals.games <- 9
+  
+  ladder.many <- 
+    data.frame(
+      sim.itn = integer(),
+      team = character(),
+      played = integer(),
+      won = integer(),
+      lost = integer(),
+      drawn = integer(), 
+      prem.pts = integer(), 
+      score.for = numeric(), 
+      score.against = numeric(), 
+      percentage = numeric(),
+      ladder.posn = integer(),
+      stringsAsFactors = FALSE
+    )
+  
+  finals.many <-
+    data.frame(
+      rnd = character(),
+      team.home = character(),
+      team.away = character(),
+      ground = character(),
+      team.home.score = numeric(),
+      team.away.score = numeric(),
+      winner = character(),
+      loser = character(),
+      stringsAsFactors = FALSE
+    )
   
   for (itn in 1 : n.itns) {
-    sim.data <- SimulateSeasonElo(season, fixture.season, team.data, ground.data, ground.location, travel.distance)
-    ladder.many <- rbind(ladder.many, cbind(sim.itn = rep(itn, n.teams), sim.data$ladder.data))
+    
+    sim.data <- 
+      SimulateFullSeasonElo(
+        season,
+        fixture.season,
+        team.data,
+        ground.data,
+        team.dictionary,
+        ground.location,
+        travel.distance,
+        elo.params,
+        rating.time.series,
+        margin.error.sigma,
+        lose.score.mu,
+        lose.score.sigma
+      )
+    
+    # sim.data <- SimulateSeasonElo(season, fixture.season, team.data, ground.data, ground.location, travel.distance)
+    
+    # Sim results:
+    # finals = finals,
+    # ladder.data = ladder.data,
+    # team.data = team.data,
+    # ground.data = ground.data,
+    # rating.time.series = rating.time.series
+    
+    ladder.many <- 
+      rbind(
+        ladder.many, 
+        cbind(
+          sim.itn = rep(itn, n.teams), 
+          sim.data$ladder.data
+        )
+      )
+    
+    finals.many <-
+      rbind(
+        finals.many,
+        cbind(
+          sim.itn = rep(itn, n.finals.games), 
+          sim.data$finals
+        )
+      )
+    
   }
   
-  ladder.many
+  result <-
+    list(
+      ladder.many = ladder.many,
+      finals.many = finals.many
+    )
+  
 }
 
 # tic()
 # ladder.many <- SimulateSeasonEloMany(2018, fixture.season, 5000, team.data.run, ground.data.run, ground.location, travel.distance)
 # toc()
 # ladder.many %>% filter(team == "hawthorn") %>% group_by(ladder.posn) %>% count() %>% mutate(p = n/5000) %>% ggplot(aes(ladder.posn, p)) + geom_col()
+
 
 
