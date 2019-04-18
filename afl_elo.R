@@ -44,9 +44,35 @@ CalculateRatingNew <- function(rating, result.exp, result.act, param.coeff.updat
 }
 
 
-RegressRating <- function(rating, param.rating.mean, param.regress) {
+CalculateRegressRating <- function(rating, param.rating.mean, param.regress) {
   rating.new <- 
     ((1 - param.regress) * rating) + (param.regress * param.rating.mean)
+}
+
+
+RegressRatings <- function(season, team.data, elo.params) {
+
+  # Ratings are only regressed to mean for teams that played previous season and
+  # are also active this season
+  yes.regress <- 
+    (team.data$season.start < season) & (team.data$season.end >= season)
+  
+  if (any(yes.regress)) {
+    
+    team.data$rating[yes.regress] <- 
+      CalculateRegressRating(
+        team.data$rating[yes.regress], 
+        elo.params$rating.mean, 
+        elo.params$regress.rating
+      )
+    
+    # TODO: Check if need to regress ground ratings?
+    # ground.data[, c(F, yes.regress)] <- RegressRating(ground.data[, c(F, yes.regress)], 0, param.regress.ground)
+    
+  }
+ 
+  team.data
+   
 }
 
 
@@ -179,12 +205,14 @@ RunElo <- function(all.games,
     # If this game marks the start of a new season ...
     if (season.of.prev.game != season.current) {
       
-      # Ratings regress to mean for teams that played the previous season
-      yes.regress <- (team.data$season.start < season.current) & (team.data$season.end >= season.current)
-      if (any(yes.regress)) {
-        team.data$rating[yes.regress] <- RegressRating(team.data$rating[yes.regress], param.rating.mean, param.regress.rating)
-        #ground.data[, c(F, yes.regress)] <- RegressRating(ground.data[, c(F, yes.regress)], 0, param.regress.ground)
-      }
+      team.data <- RegressRatings(season.current, team.data, elo.params)
+      
+      # # Ratings regress to mean for teams that played the previous season
+      # yes.regress <- (team.data$season.start < season.current) & (team.data$season.end >= season.current)
+      # if (any(yes.regress)) {
+      #   team.data$rating[yes.regress] <- CalculateRegressRating(team.data$rating[yes.regress], param.rating.mean, param.regress.rating)
+      #   #ground.data[, c(F, yes.regress)] <- RegressRating(ground.data[, c(F, yes.regress)], 0, param.regress.ground)
+      # }
       
       # Determine active teams and record their rating at season start (after regression)
       yes.active <- (team.data$season.start <= season.current) & (team.data$season.end >= season.current)
