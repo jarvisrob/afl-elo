@@ -15,7 +15,7 @@ ScrapeAFLTablesSeasonFixture <- function(season) {
   relevant.html.tables <- soup %>% html_nodes("body center > table")
   
   # Blank data frame to fill with fixture
-  fixture <- tibble(round = integer(), game = integer(), team.home = character(), team.away = character(), ground = character())
+  fixture <- data.frame(rnd = integer(), game = integer(), team.home = character(), team.away = character(), ground = character(), stringsAsFactors = FALSE)
   
   # Outer loop through rounds in season (regular season only)
   rnd <- 1
@@ -42,7 +42,7 @@ ScrapeAFLTablesSeasonFixture <- function(season) {
         team.home <- game.str.raw[1]
         ground <- game.str.raw[2]
         team.away <- game.str.raw[3]
-        game.row <- tibble(round = rnd, game = game, team.home = team.home, team.away = team.away, ground = ground)
+        game.row <- data.frame(rnd = rnd, game = game, team.home = team.home, team.away = team.away, ground = ground, stringsAsFactors = FALSE)
         fixture <- rbind(fixture, game.row)
       }
       

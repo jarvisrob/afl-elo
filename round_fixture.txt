@@ -1,4 +1,12 @@
-# 2017, GF fixture
+# 2019, R5 fixture
 
-team.home				team.away				ground
-adelaide				richmond				M.C.G.
+team.home                 team.away                 ground
+brisbane.lions            collingwood               Gabba
+north.melbourne           essendon                  Docklands
+west.coast.eagles         port.adelaide             "Perth Stadium"
+greater.western.sydney    fremantle                 "Manuka Oval"
+melbourne                 st.kilda                  M.C.G.
+richmond                  sydney                    Docklands
+western.bulldogs          carlton                   Docklands
+adelaide                  gold.coast                "Adelaide Oval"
+hawthorn                  geelong                   M.C.G.
