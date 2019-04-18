@@ -17,7 +17,7 @@ source("afl_parse_excel_fixture.R")
 source("afltables_scrape_season_fixture.R")
 
 # Prediction run (all games to today) or testing run (games until end 2018)
-yes.pred.run <- FALSE
+yes.pred.run <- TRUE
 
 # Download the list of all games from AFL tables?
 do.download = TRUE
@@ -81,11 +81,11 @@ if (!yes.pred.run) {
   calib.1994.2016 <- CheckCalibration(elo.1994.2016, 0.05)
 } else {
   fixture <- LoadRoundFixture()
-  PredictRound(fixture, 2019, "R4", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
+  PredictRound(fixture, 2019, "R5", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
                param.spread = 400,
                param.margin = 0.03213133,
                param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
-               con = 'out/afl_elo_pred_2019-R4.txt')
+               con = 'out/afl_elo_pred_2019-R5.txt')
                # con = stdout())
 }
 

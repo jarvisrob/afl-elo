@@ -805,10 +805,3 @@ SimulateFullSeasonEloMany <- function(season,
   
 }
 
-# tic()
-# ladder.many <- SimulateSeasonEloMany(2018, fixture.season, 5000, team.data.run, ground.data.run, ground.location, travel.distance)
-# toc()
-# ladder.many %>% filter(team == "hawthorn") %>% group_by(ladder.posn) %>% count() %>% mutate(p = n/5000) %>% ggplot(aes(ladder.posn, p)) + geom_col()
-
-
-
