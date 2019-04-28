@@ -80,13 +80,39 @@ SimulateRegularSeasonElo <- function(season,
       stringsAsFactors = FALSE
     )
   
-  # TODO: !!! NEED TO REGRESS RATINGS BEFORE COMMENCING SEASON SIM !!!
-  # BUt only do so if simualting from season start
-  # 
+  n.rounds <- 
+    fixture.season %>%
+      pull(rnd) %>%
+      unique() %>% 
+      length()
+  
+  # Set-up the season if simulating a whole new season, which is determined by 
+  # checking to see if the first game to be simulated is Game 1 of Round 1
+  if (fixture.season[[1, "rnd"]] == 1 && fixture.season[[1, "game"]] == 1) {
+    
+    setup <- 
+      SetupSeason(
+        team.data, 
+        rating.time.series, 
+        season, 
+        elo.params
+      )
+    
+    team.data <- setup$team.data
+    rating.time.series <- setup$rating.time.series
+    
+    # team.data <- RegressRatings(season.current, team.data, elo.params)
+    # 
+    # yes.active <- 
+    #   (team.data$season.start <= season) & (team.data$season.end >= season)
+    # 
+    # rating.time.series[paste(season, 'start', sep = ' '), yes.active] <- 
+    #   team.data$rating[yes.active]
+    
+  }
+  
   # TODO: If starting halfway though season, load current laddeer
-  
-  n.rounds <- max(fixture.season[, "rnd"])
-  
+
   txt <- c(paste0("Season: ", season), "---")
   
   for (i in 1 : n.rounds) {

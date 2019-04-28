@@ -1,12 +1,12 @@
-# 2019, R5 fixture
+# 2019, R6 fixture
 
 team.home                 team.away                 ground
-brisbane.lions            collingwood               Gabba
-north.melbourne           essendon                  Docklands
-west.coast.eagles         port.adelaide             "Perth Stadium"
-greater.western.sydney    fremantle                 "Manuka Oval"
-melbourne                 st.kilda                  M.C.G.
-richmond                  sydney                    Docklands
-western.bulldogs          carlton                   Docklands
-adelaide                  gold.coast                "Adelaide Oval"
-hawthorn                  geelong                   M.C.G.
+richmond                  melbourne                 M.C.G.
+essendon                  collingwood               M.C.G.
+port.adelaide             north.melbourne           "Adelaide Oval"
+gold.coast                brisbane.lions            Carrara
+st.kilda                  adelaide                  Docklands
+sydney                    greater.western.sydney    S.C.G.
+fremantle                 western.bulldogs          "Perth Stadium"
+hawthorn                  carlton                   "York Park"
+geelong                   west.coast.eagles         "Kardinia Park"

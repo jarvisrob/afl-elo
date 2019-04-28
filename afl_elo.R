@@ -44,10 +44,89 @@ CalculateRatingNew <- function(rating, result.exp, result.act, param.coeff.updat
 }
 
 
-RegressRating <- function(rating, param.rating.mean, param.regress) {
+CalculateRegressRating <- function(rating, param.rating.mean, param.regress) {
   rating.new <- 
     ((1 - param.regress) * rating) + (param.regress * param.rating.mean)
 }
+
+
+RegressRatings <- function(season, team.data, elo.params) {
+
+  # Ratings are only regressed to mean for teams that played previous season and
+  # are also active this season
+  yes.regress <- 
+    (team.data$season.start < season) & (team.data$season.end >= season)
+  
+  if (any(yes.regress)) {
+    
+    team.data$rating[yes.regress] <- 
+      CalculateRegressRating(
+        team.data$rating[yes.regress], 
+        elo.params$rating.mean, 
+        elo.params$regress.rating
+      )
+    
+    # TODO: Check if need to regress ground ratings?
+    # ground.data[, c(F, yes.regress)] <- RegressRating(ground.data[, c(F, yes.regress)], 0, param.regress.ground)
+    
+  }
+ 
+  team.data
+   
+}
+
+
+SetupSeason <- function(team.data,
+                        rating.time.series,
+                        season,
+                        elo.params) {
+  
+  team.data <- RegressRatings(season, team.data, elo.params)
+  
+  team.data$yes.active <- 
+    (team.data$season.start <= season) & 
+    (team.data$season.end >= season)
+  
+  # Record ratings of active teams at season start (after regression)
+  # TODO: Refactor - using rownames in this way is bad and hard to read and
+  # creates weird looking code like that below
+  rating.time.series[
+    paste(season, 'start', sep = ' '), 
+    team.data$yes.active
+  ] <-
+    team.data$rating[team.data$yes.active]
+  
+  # Move the Swans to Sydney in 1982
+  if (
+    (team.data['sydney', 'location'] != 'Sydney') &
+    (season >= 1982)
+  ) {
+    team.data['sydney', 'location'] <- 'Sydney'
+  }
+  
+  # Change the home ground of West Coast Eagles and Fremantle to 
+  # Perth Stadium in 2018
+  if (
+    (team.data['west.coast.eagles', 'home.ground'] != 'Perth Stadium') &
+    (season >= 2018)
+  ) {
+    team.data['west.coast.eagles', 'home.ground'] <- 'Perth Stadium'
+  }
+  if (
+    (team.data['fremantle', 'home.ground'] != 'Perth Stadium') &
+    (season >= 2018)
+  ) {
+    team.data['fremantle', 'home.ground'] <- 'Perth Stadium'
+  }
+  
+  result <-
+    list(
+      team.data = team.data,
+      rating.time.series = rating.time.series
+    )
+  
+}
+
 
 
 DoGameElo <- function(game.info, 
@@ -141,6 +220,7 @@ RunElo <- function(all.games,
                    travel.distance,
                    rating.time.series, 
                    all.games.elo,
+                   elo.params,
                    param.rating.mean, 
                    param.spread,
                    param.margin,
@@ -179,31 +259,45 @@ RunElo <- function(all.games,
     # If this game marks the start of a new season ...
     if (season.of.prev.game != season.current) {
       
-      # Ratings regress to mean for teams that played the previous season
-      yes.regress <- (team.data$season.start < season.current) & (team.data$season.end >= season.current)
-      if (any(yes.regress)) {
-        team.data$rating[yes.regress] <- RegressRating(team.data$rating[yes.regress], param.rating.mean, param.regress.rating)
-        #ground.data[, c(F, yes.regress)] <- RegressRating(ground.data[, c(F, yes.regress)], 0, param.regress.ground)
-      }
+      setup <- 
+        SetupSeason(
+          team.data, 
+          rating.time.series, 
+          season.current, 
+          elo.params
+        )
       
-      # Determine active teams and record their rating at season start (after regression)
-      yes.active <- (team.data$season.start <= season.current) & (team.data$season.end >= season.current)
-      rating.time.series[paste(season.current, 'start', sep = ' '), yes.active] <- team.data$rating[yes.active]
-    
-      # Move the Swans to Sydney in 1982
-      if ((team.data['sydney', 'location'] != 'Sydney') & (season.current >= 1982)) {
-        team.data['sydney', 'location'] <- 'Sydney'
-      }
+      team.data <- setup$team.data
+      rating.time.series <- setup$rating.time.series
       
-      # Change the home ground of West Coast Eagles and Fremantle to 
-      # Perth Stadium in 2018
-      if ((team.data['west.coast.eagles', 'home.ground'] != 'Perth Stadium') & (season.current >= 2018)) {
-        team.data['west.coast.eagles', 'home.ground'] <- 'Perth Stadium'
-      }
-      if ((team.data['fremantle', 'home.ground'] != 'Perth Stadium') & (season.current >= 2018)) {
-        team.data['fremantle', 'home.ground'] <- 'Perth Stadium'
-      }
+      # team.data <- RegressRatings(season.current, team.data, elo.params)
+      # 
+      # # # Ratings regress to mean for teams that played the previous season
+      # # yes.regress <- (team.data$season.start < season.current) & (team.data$season.end >= season.current)
+      # # if (any(yes.regress)) {
+      # #   team.data$rating[yes.regress] <- CalculateRegressRating(team.data$rating[yes.regress], param.rating.mean, param.regress.rating)
+      # #   #ground.data[, c(F, yes.regress)] <- RegressRating(ground.data[, c(F, yes.regress)], 0, param.regress.ground)
+      # # }
+      # 
+      # # Determine active teams and record their rating at season start (after regression)
+      # yes.active <- (team.data$season.start <= season.current) & (team.data$season.end >= season.current)
+      # rating.time.series[paste(season.current, 'start', sep = ' '), yes.active] <- team.data$rating[yes.active]
+      # 
+      # # Move the Swans to Sydney in 1982
+      # if ((team.data['sydney', 'location'] != 'Sydney') & (season.current >= 1982)) {
+      #   team.data['sydney', 'location'] <- 'Sydney'
+      # }
+      # 
+      # # Change the home ground of West Coast Eagles and Fremantle to 
+      # # Perth Stadium in 2018
+      # if ((team.data['west.coast.eagles', 'home.ground'] != 'Perth Stadium') & (season.current >= 2018)) {
+      #   team.data['west.coast.eagles', 'home.ground'] <- 'Perth Stadium'
+      # }
+      # if ((team.data['fremantle', 'home.ground'] != 'Perth Stadium') & (season.current >= 2018)) {
+      #   team.data['fremantle', 'home.ground'] <- 'Perth Stadium'
+      # }
 
+      
       # Start calibration/optimisation for 1994 season
       if (season.current == 1994) {
         margin.cumulative.abs.error <- 0
@@ -323,14 +417,20 @@ RunElo <- function(all.games,
   
   }
 
-  # Record the currently active teams at the conlcusion of all games iterated
-  team.data$yes.active <- yes.active
+  # # Record the currently active teams at the conlcusion of all games iterated
+  # team.data$yes.active <- yes.active
 
-  # Collate and return the results
-  elo.result <- list(team.data, rating.time.series,
-                     ground.data, all.games.elo,
-                     margin.cumulative.abs.error, result.cumulative.abs.error,
-                     brier.cumulative.error, log.score.cumulative.error,
-                     margin.cumulative.sq.error)
-  elo.result
+  elo.result <- 
+    list(
+      team.data, 
+      rating.time.series,
+      ground.data, 
+      all.games.elo,
+      margin.cumulative.abs.error,
+      result.cumulative.abs.error,
+      brier.cumulative.error,
+      log.score.cumulative.error,
+      margin.cumulative.sq.error
+    )
+  
 }
