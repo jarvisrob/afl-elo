@@ -86,18 +86,28 @@ SimulateRegularSeasonElo <- function(season,
       unique() %>% 
       length()
   
-  # Regress team ratings to the mean if simulating a whole new season, which is
-  # determined by checking to see if the first game to be simulated is Game 1 of
-  # Round 1
+  # Set-up the season if simulating a whole new season, which is determined by 
+  # checking to see if the first game to be simulated is Game 1 of Round 1
   if (fixture.season[[1, "rnd"]] == 1 && fixture.season[[1, "game"]] == 1) {
     
-    team.data <- RegressRatings(season.current, team.data, elo.params)
+    setup <- 
+      SetupSeason(
+        team.data, 
+        rating.time.series, 
+        season, 
+        elo.params
+      )
     
-    yes.active <- 
-      (team.data$season.start <= season) & (team.data$season.end >= season)
+    team.data <- setup$team.data
+    rating.time.series <- setup$rating.time.series
     
-    rating.time.series[paste(season, 'start', sep = ' '), yes.active] <- 
-      team.data$rating[yes.active]
+    # team.data <- RegressRatings(season.current, team.data, elo.params)
+    # 
+    # yes.active <- 
+    #   (team.data$season.start <= season) & (team.data$season.end >= season)
+    # 
+    # rating.time.series[paste(season, 'start', sep = ' '), yes.active] <- 
+    #   team.data$rating[yes.active]
     
   }
   

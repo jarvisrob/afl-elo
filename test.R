@@ -20,7 +20,7 @@ source("afltables_scrape_season_fixture.R")
 yes.pred.run <- FALSE
 
 # Download the list of all games from AFL tables?
-do.download = TRUE
+do.download = FALSE
 
 # Init
 all.games <- GetAllGames(do.download = do.download)

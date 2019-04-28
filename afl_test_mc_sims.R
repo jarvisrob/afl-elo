@@ -4,8 +4,8 @@ fixture.2019[108, "team.away"] <- "St Kilda"
 fixture.2019[108, "ground"] <- "Riverway Stadium"
 
 # Testing MC sims
-n.itns <- 50
-check.team <- "essendon"
+n.itns <- 100
+check.team <- "melbourne"
 
 team.ratings <- 
   team.data.run %>%
