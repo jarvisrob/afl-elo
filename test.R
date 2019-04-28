@@ -17,7 +17,7 @@ source("afl_parse_excel_fixture.R")
 source("afltables_scrape_season_fixture.R")
 
 # Prediction run (all games to today) or testing run (games until end 2018)
-yes.pred.run <- TRUE
+yes.pred.run <- FALSE
 
 # Download the list of all games from AFL tables?
 do.download = TRUE
@@ -40,17 +40,28 @@ travel.distance <- InitTravelDistance()
 # Run Elo
 print("Starting Elo run ...")
 tic()
-elo.result <- RunElo(all.games, team.dictionary, team.data,
-                     ground.location, ground.data, travel.distance,
-                     rating.time.series, all.games.elo,
-                     param.rating.mean = 1500, param.spread = 400,
-                     param.margin = 0.03213133,
-                     param.coeff.rating.update = 76.72256, param.regress.rating = 0.2038160,
-                     param.coeff.ground.update = 1.675048,
-                     param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
-                     param.rating.expansion.init = 1330,
-                     do.store.detail = TRUE)
-
+elo.result <- 
+  RunElo(
+    all.games, 
+    team.dictionary, 
+    team.data,
+    ground.location, 
+    ground.data, 
+    travel.distance,
+    rating.time.series, 
+    all.games.elo,
+    elo.params,
+    param.rating.mean = 1500, 
+    param.spread = 400,
+    param.margin = 0.03213133,
+    param.coeff.rating.update = 76.72256, 
+    param.regress.rating = 0.2038160,
+    param.coeff.ground.update = 1.675048,
+    param.coeff.travel = 14.01393, 
+    param.power.travel = 0.2689826,
+    param.rating.expansion.init = 1330,
+    do.store.detail = TRUE
+  )
 toc()
 print("... Finished Elo run")
 
@@ -81,11 +92,11 @@ if (!yes.pred.run) {
   calib.1994.2016 <- CheckCalibration(elo.1994.2016, 0.05)
 } else {
   fixture <- LoadRoundFixture()
-  PredictRound(fixture, 2019, "R5", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
+  PredictRound(fixture, 2019, "R6", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
                param.spread = 400,
                param.margin = 0.03213133,
                param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
-               con = 'out/afl_elo_pred_2019-R5.txt')
+               con = 'out/afl_elo_pred_2019-R6.txt')
                # con = stdout())
 }
 
