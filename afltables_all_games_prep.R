@@ -24,33 +24,19 @@ GetAllGames <- function(file.url = 'http://afltables.com/afl/stats/biglists/bg3.
   all.games$date <- as.Date(all.games$date, format = '%d-%b-%Y')
   all.games$season <- as.integer(format(all.games$date, "%Y"))
   
-  #all.games$round <- factor(all.games$round)
-  
-  #all.games$team.home <- factor(all.games$team.home)
-  
   all.games$score.goals.home <- ParseGoalsBehindsPts(all.games$score.home, 1)
   all.games$score.behinds.home <- ParseGoalsBehindsPts(all.games$score.home, 2)
   all.games$score.points.home <- ParseGoalsBehindsPts(all.games$score.home, 3)
-  
-  #all.games$team.away <- factor(all.games$team.away)
   
   all.games$score.goals.away <- ParseGoalsBehindsPts(all.games$score.away, 1)
   all.games$score.behinds.away <- ParseGoalsBehindsPts(all.games$score.away, 2)
   all.games$score.points.away <- ParseGoalsBehindsPts(all.games$score.away, 3)
   
-  #all.games$ground <- factor(all.games$ground)
-  
   # Semi-finals in 1897 were played in three rounds, but are just listed as 'SF' in txt file
   all.games <- CorrectSfRoundRobin(all.games, 1897, c('SF1', 'SF1', 'SF2', 'SF2', 'SF3', 'SF3'))
-  #sf.correction.vector <- c('SF1', 'SF1', 'SF2', 'SF2', 'SF3', 'SF3')
-  #game.idx <- (all.games$date <= '1897-12-31') & (all.games$round == 'SF')
-  #all.games$round[game.idx] <- sf.correction.vector
-  
+
   # Semi-final round-robin system was used in 1924, with result that no GF was required
   all.games <- CorrectSfRoundRobin(all.games, 1924, c('SF1', 'SF1', 'SF2', 'SF2', 'SF3', 'SF3'))
-  
-  # 1990 has a drawn QF - replayed next week
-  # 20?? has drawn GF - replayed next week
   
   # During 1991-1993, QF and EF were in the same round
   all.games <- CorrectQfEf(all.games, year.start = 1991, year.end = 1993)

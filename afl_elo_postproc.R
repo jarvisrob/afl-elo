@@ -3,15 +3,6 @@ CheckCalibration <- function(games.elo, bin.width) {
   bin.edges <- lapply(seq(0, 1 - bin.width, by = bin.width),
                       function(x) c(x, x + bin.width))
 
-  # Randomise checking home or away team result vs outcome
-  #n.games <- nrow(games.elo)
-  #rand.logical <- sample(c(TRUE, FALSE), n.games, replace = TRUE)
-  #games.rand <- data.frame(result.exp = rep(0, n.games), outcome = rep(0, n.games))
-  #games.rand[rand.logical, "result.exp"] <- games.elo[rand.logical, "result.exp.home"]
-  #games.rand[rand.logical, "outcome"] <- games.elo[rand.logical, "outcome.home"]
-  #games.rand[!rand.logical, "result.exp"] <- games.elo[!rand.logical, "result.exp.away"]
-  #games.rand[!rand.logical, "outcome"] <- 1 - games.elo[!rand.logical, "outcome.home"]
-
   games.rand <- SelectHomeOrAwayValueRandom(games.elo, c("result.exp", "outcome"))
 
   win.frac <- sapply(bin.edges, GetFracWinsInBin, games.rand)
@@ -20,8 +11,6 @@ CheckCalibration <- function(games.elo, bin.width) {
 
   calib <- data.frame(bin.mid = bin.mid, win.frac = win.frac, calib.error = calib.error)
 
-  # plot(calib$bin.mid, calib$win.frac)
-  # lines(c(0, 1), c(0, 1))
   p <- ggplot(calib, aes(bin.mid, win.frac)) + geom_point() + geom_abline(intercept = 0, slope = 1)
   print(p)
 

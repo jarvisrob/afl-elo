@@ -67,7 +67,6 @@ RegressRatings <- function(season, team.data, elo.params) {
       )
     
     # TODO: Check if need to regress ground ratings?
-    # ground.data[, c(F, yes.regress)] <- RegressRating(ground.data[, c(F, yes.regress)], 0, param.regress.ground)
     
   }
  
@@ -270,34 +269,6 @@ RunElo <- function(all.games,
       team.data <- setup$team.data
       rating.time.series <- setup$rating.time.series
       
-      # team.data <- RegressRatings(season.current, team.data, elo.params)
-      # 
-      # # # Ratings regress to mean for teams that played the previous season
-      # # yes.regress <- (team.data$season.start < season.current) & (team.data$season.end >= season.current)
-      # # if (any(yes.regress)) {
-      # #   team.data$rating[yes.regress] <- CalculateRegressRating(team.data$rating[yes.regress], param.rating.mean, param.regress.rating)
-      # #   #ground.data[, c(F, yes.regress)] <- RegressRating(ground.data[, c(F, yes.regress)], 0, param.regress.ground)
-      # # }
-      # 
-      # # Determine active teams and record their rating at season start (after regression)
-      # yes.active <- (team.data$season.start <= season.current) & (team.data$season.end >= season.current)
-      # rating.time.series[paste(season.current, 'start', sep = ' '), yes.active] <- team.data$rating[yes.active]
-      # 
-      # # Move the Swans to Sydney in 1982
-      # if ((team.data['sydney', 'location'] != 'Sydney') & (season.current >= 1982)) {
-      #   team.data['sydney', 'location'] <- 'Sydney'
-      # }
-      # 
-      # # Change the home ground of West Coast Eagles and Fremantle to 
-      # # Perth Stadium in 2018
-      # if ((team.data['west.coast.eagles', 'home.ground'] != 'Perth Stadium') & (season.current >= 2018)) {
-      #   team.data['west.coast.eagles', 'home.ground'] <- 'Perth Stadium'
-      # }
-      # if ((team.data['fremantle', 'home.ground'] != 'Perth Stadium') & (season.current >= 2018)) {
-      #   team.data['fremantle', 'home.ground'] <- 'Perth Stadium'
-      # }
-
-      
       # Start calibration/optimisation for 1994 season
       if (season.current == 1994) {
         margin.cumulative.abs.error <- 0
@@ -362,28 +333,12 @@ RunElo <- function(all.games,
     rating.time.series[season.round.current, team.home] <- new.rating.home
     rating.time.series[season.round.current, team.away] <- new.rating.away
 
-    # Determine outcome (win/loss/draw) for the home team, and also update the
-    # ground panel records with the win/loss/draw outcome
-    #idx.gpr.team.home <- (ground.panel.record$team == team.home) &
-                         #(ground.panel.record$ground == ground) &
-                         #(ground.panel.record$season == season.current)
-    #idx.gpr.team.away <- (ground.panel.record$team == team.away) &
-                         #(ground.panel.record$ground == ground) &
-                         #(ground.panel.record$season == season.current)
-    #ground.panel.record[idx.gpr.team.home, "played"] <- ground.panel.record[idx.gpr.team.home, "played"] + 1
-    #ground.panel.record[idx.gpr.team.away, "played"] <- ground.panel.record[idx.gpr.team.away, "played"] + 1
     if (score.points.home > score.points.away) {
       outcome.home <- 1
-      #ground.panel.record[idx.gpr.team.home, "wins"] <- ground.panel.record[idx.gpr.team.home, "wins"] + 1
-      #ground.panel.record[idx.gpr.team.away, "losses"] <- ground.panel.record[idx.gpr.team.away, "losses"] + 1
     } else if (score.points.home < score.points.away) {
       outcome.home <- 0
-      #ground.panel.record[idx.gpr.team.home, "losses"] <- ground.panel.record[idx.gpr.team.home, "losses"] + 1
-      #ground.panel.record[idx.gpr.team.away, "wins"] <- ground.panel.record[idx.gpr.team.away, "wins"] + 1
     } else {
       outcome.home <- 0.5
-      #ground.panel.record[idx.gpr.team.home, "draws"] <- ground.panel.record[idx.gpr.team.home, "draws"] + 1
-      #ground.panel.record[idx.gpr.team.away, "draws"] <- ground.panel.record[idx.gpr.team.away, "draws"] + 1
     }
     outcome.away <- 1 - outcome.home
 
@@ -416,9 +371,6 @@ RunElo <- function(all.games,
     margin.cumulative.sq.error <- margin.cumulative.sq.error + (margin.act.home - margin.exp.home) ^ 2
   
   }
-
-  # # Record the currently active teams at the conlcusion of all games iterated
-  # team.data$yes.active <- yes.active
 
   elo.result <- 
     list(

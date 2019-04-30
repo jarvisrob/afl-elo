@@ -101,14 +101,6 @@ SimulateRegularSeasonElo <- function(season,
     team.data <- setup$team.data
     rating.time.series <- setup$rating.time.series
     
-    # team.data <- RegressRatings(season.current, team.data, elo.params)
-    # 
-    # yes.active <- 
-    #   (team.data$season.start <= season) & (team.data$season.end >= season)
-    # 
-    # rating.time.series[paste(season, 'start', sep = ' '), yes.active] <- 
-    #   team.data$rating[yes.active]
-    
   }
   
   # TODO: If starting halfway though season, load current laddeer
