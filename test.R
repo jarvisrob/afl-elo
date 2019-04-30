@@ -13,7 +13,8 @@ source("afl_elo_predict_game.R")
 source("afl_elo_postproc.R")
 source("afl_elo_sim.R")
 source("afl_parse_excel_fixture.R")
-source("afltables_scrape_season_fixture.R")
+source("afltables_scrape.R")
+source("afl_fixture_manipulation.R")
 
 # Prediction run (all games to today) or testing run (games until end 2018)
 yes.pred.run <- FALSE
