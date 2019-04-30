@@ -100,7 +100,32 @@ ScrapeAflTablesLadder <- function(season) {
   
   # Collect raw HTML "soup" that is the webpage and extract the tables that contain fixture content only
   soup <- read_html(url)
-  #relevant.html.tables <- soup %>% html_nodes("body center > table")
+  # ladder.table.rows <- soup %>% html_nodes(".sortable > tbody > tr")
+  ladder.matrix <- 
+    soup %>%
+      html_nodes(".sortable > tbody td") %>% 
+      html_text(trim = TRUE) %>%
+      matrix(nrow = 18, byrow = TRUE)
+  
+  colnames(ladder.matrix) <-
+    c(
+      "posn",
+      "team",
+      "played",
+      "won",
+      "drawn",
+      "lost",
+      "home.record",
+      "away.record",
+      "goals.behinds.for",
+      "score.for",
+      "goals.behinds.against",
+      "score.against",
+      "percentage",
+      "prem.points"
+    )
+  
+  ladder.tibble <- ladder.matrix %>% as_tibble()
   
 }
 
