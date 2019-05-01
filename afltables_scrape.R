@@ -109,7 +109,7 @@ ScrapeAflTablesLadder <- function(season) {
   
   colnames(ladder.matrix) <-
     c(
-      "posn",
+      "ladder.posn",
       "team",
       "played",
       "won",
@@ -125,8 +125,30 @@ ScrapeAflTablesLadder <- function(season) {
       "prem.points"
     )
   
-  ladder.tibble <- ladder.matrix %>% as_tibble()
-  
+  ladder.data <- 
+    ladder.matrix %>% 
+    as_tibble() %>%
+    dplyr::select(
+      team, 
+      played, 
+      won, 
+      lost,
+      drawn, 
+      prem.points,
+      score.for, 
+      score.against, 
+      ladder.posn
+    ) %>%
+    type_convert(
+      col_types = cols(
+        drawn = col_double()
+      )
+    ) %>%
+    replace_na(list(drawn = 0)) %>%
+    mutate(percentage = score.for / score.against * 100) %>%
+    mutate(team = map_chr(team, ~team.dictionary[[.]])) %>%
+    as.data.frame()
+    
 }
 
 
