@@ -57,38 +57,30 @@ SimulateRegularSeasonElo <- function(season,
                                      rating.time.series,
                                      margin.error.sigma = 38.5, 
                                      lose.score.mu = 75.2, 
-                                     lose.score.sigma = 19.2) {
+                                     lose.score.sigma = 19.2,
+                                     ladder.data = NULL) {
   
   yes.active <- (team.data$season.start <= season) & (team.data$season.end >= season)
   teams.active <- rownames(team.data[yes.active, ])
-  
   n.teams <- length(teams.active)
   zero.vector <- rep(0, n.teams)
   
-  ladder.data <- 
-    data.frame(
-      team = teams.active,
-      played = zero.vector,
-      won = zero.vector,
-      lost = zero.vector,
-      drawn = zero.vector, 
-      prem.pts = zero.vector,
-      score.for = zero.vector,
-      score.against = zero.vector,
-      percentage = zero.vector,
-      ladder.posn = zero.vector,
-      stringsAsFactors = FALSE
-    )
+  # n.rounds <- 
+  #   fixture.season %>%
+  #     pull(rnd) %>%
+  #     unique() %>% 
+  #     length()
   
-  n.rounds <- 
+  rnds <-
     fixture.season %>%
-      pull(rnd) %>%
-      unique() %>% 
-      length()
+    pull(rnd) %>%
+    unique() %>%
+    sort()
   
   # Set-up the season if simulating a whole new season, which is determined by 
-  # checking to see if the first game to be simulated is Game 1 of Round 1
-  if (fixture.season[[1, "rnd"]] == 1 && fixture.season[[1, "game"]] == 1) {
+  # checking to see ladder data has been provided, representing progress so far
+  # through the season
+  if (is.null(ladder.data)) {
     
     setup <- 
       SetupSeason(
@@ -101,18 +93,33 @@ SimulateRegularSeasonElo <- function(season,
     team.data <- setup$team.data
     rating.time.series <- setup$rating.time.series
     
+    ladder.data <- 
+      data.frame(
+        team = teams.active,
+        played = zero.vector,
+        won = zero.vector,
+        lost = zero.vector,
+        drawn = zero.vector, 
+        prem.pts = zero.vector,
+        score.for = zero.vector,
+        score.against = zero.vector,
+        percentage = zero.vector,
+        ladder.posn = zero.vector,
+        stringsAsFactors = FALSE
+      )
+    
   }
   
-  # TODO: If starting halfway though season, load current laddeer
+  # TODO: Check if working when starts partway through season
 
   txt <- c(paste0("Season: ", season), "---")
   
-  for (i in 1 : n.rounds) {
+  for (i in rnds) {
     
     fixture.round <- fixture.season %>% filter(rnd == i)
-    n.games <- nrow(fixture.round)
+    games <- fixture.round %>% pull(game) %>% sort()
     
-    for (j in 1 : n.games) {
+    for (j in games) {
       
       game.info <- list(
         season = season,
@@ -144,10 +151,10 @@ SimulateRegularSeasonElo <- function(season,
       ladder.data <- sim.game.result$ladder.data
 
       txt <- append(txt, paste0("R", i, " G", j, ": ", game.info$team.home, " vs ", game.info$team.away, " at ", game.info$ground))
-      txt <- append(txt, paste0("rating.home = ", team.data[game.info$team.home, 'rating'], " | rating.away = ", team.data[game.info$team.away, 'rating']))
-      txt <- append(txt, paste0("gnd.adj.home = ", CalculateGroundAdj(game.info$team.home, game.info$ground, ground.data), 
-                                " | gnd.adj.away = ", CalculateGroundAdj(game.info$team.away, game.info$ground, ground.data)))
-      
+      txt <- append(txt, paste0("rating.home = ", elo.game$old.rating.home, " | rating.away = ", elo.game$old.rating.away))
+      txt <- append(txt, paste0("gnd.adj.home = ", elo.game$old.rating.ground.adj.home,
+                                " | gnd.adj.away = ", elo.game$old.rating.ground.adj.away))
+
       txt <- append(txt, paste0("home = ", game.info$score.points.home, " | away = ", game.info$score.points.away))
             
       txt <- append(txt, paste0("new.rating.home = ", elo.game$new.rating.home, " | new.rating.away = ", elo.game$new.rating.away))
@@ -666,7 +673,8 @@ SimulateFullSeasonElo <- function(season,
                                   rating.time.series,
                                   margin.error.sigma = 38.5,
                                   lose.score.mu = 75.2,
-                                  lose.score.sigma = 19.2) {
+                                  lose.score.sigma = 19.2,
+                                  ladder.data = NULL) {
   
   sim.reg.result <- 
     SimulateRegularSeasonElo(
@@ -681,7 +689,8 @@ SimulateFullSeasonElo <- function(season,
       rating.time.series,
       margin.error.sigma,
       lose.score.mu,
-      lose.score.sigma
+      lose.score.sigma,
+      ladder.data
     )
   
   team.data <- sim.reg.result$team.data

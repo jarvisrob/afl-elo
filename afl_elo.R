@@ -185,8 +185,18 @@ DoGameElo <- function(game.info,
   new.rating.ground.adj.home <- CalculateRatingNew(rating.ground.adj.home, result.exp.home, result.act.home, param.coeff.ground.update)
   new.rating.ground.adj.away <- CalculateRatingNew(rating.ground.adj.away, result.exp.away, result.act.away, param.coeff.ground.update)
   
-  elo.game <- list(new.rating.home = new.rating.home, new.rating.away = new.rating.away,
-                   new.rating.ground.adj.home = new.rating.ground.adj.home, new.rating.ground.adj.away = new.rating.ground.adj.away)
+  elo.game <- 
+    list(
+      old.rating.home = rating.home,
+      old.rating.away = rating.away,
+      old.rating.ground.adj.home = rating.ground.adj.home,
+      old.rating.ground.adj.away = rating.ground.adj.away,
+      new.rating.home = new.rating.home, 
+      new.rating.away = new.rating.away,
+      new.rating.ground.adj.home = new.rating.ground.adj.home, 
+      new.rating.ground.adj.away = new.rating.ground.adj.away
+    )
+  
 }
 
 UpdateEloRatings <- function(team.data, 

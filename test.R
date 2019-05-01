@@ -24,9 +24,9 @@ do.download = TRUE
 
 # Init
 all.games <- GetAllGames(do.download = do.download)
-if (!yes.pred.run) {
-  all.games <- all.games %>% filter(season <= 2018)
-}
+# if (!yes.pred.run) {
+#   all.games <- all.games %>% filter(season <= 2018)
+# }
 all.games.elo <- InitAllGamesElo(all.games)
 team.dictionary <- InitTeamLDictionary()
 team.dictionary.reverse <- InitTeamDictionaryReverse()
