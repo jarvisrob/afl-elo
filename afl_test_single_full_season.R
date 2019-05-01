@@ -14,7 +14,7 @@ fixture.2019 <- ExtractRemainingSeasonFixture(fixture.2019, 7)
 
 print("--- Test single full season sim")
 
-# print("Team ratings (ranked) at end of 2018 season")
+print("Team ratings before starting sim")
 team.data.run %>%
   rownames_to_column("team") %>%
   filter(yes.active) %>%

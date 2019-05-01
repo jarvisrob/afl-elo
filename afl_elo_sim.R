@@ -65,12 +65,6 @@ SimulateRegularSeasonElo <- function(season,
   n.teams <- length(teams.active)
   zero.vector <- rep(0, n.teams)
   
-  # n.rounds <- 
-  #   fixture.season %>%
-  #     pull(rnd) %>%
-  #     unique() %>% 
-  #     length()
-  
   rnds <-
     fixture.season %>%
     pull(rnd) %>%
@@ -109,8 +103,6 @@ SimulateRegularSeasonElo <- function(season,
       )
     
   }
-  
-  # TODO: Check if working when starts partway through season
 
   txt <- c(paste0("Season: ", season), "---")
   
@@ -196,13 +188,6 @@ SetupRegularSeasonGame <- function(game.info,
                                    fixture.round, 
                                    game.number, 
                                    team.dictionary) {
-  
-  # game.info <-
-  #   list(
-  #     team.home = team.dictionary[[fixture.round[game.number, "team.home"]]],
-  #     team.away = team.dictionary[[fixture.round[game.number, "team.away"]]],
-  #     ground = fixture.round[game.number, "ground"]
-  #   )
   
   game.info$team.home <-
     team.dictionary[[fixture.round[game.number, "team.home"]]]
@@ -738,9 +723,9 @@ SimulateFullSeasonEloMany <- function(season,
                                       rating.time.series,
                                       margin.error.sigma = 38.5,
                                       lose.score.mu = 75.2,
-                                      lose.score.sigma = 19.2) {
+                                      lose.score.sigma = 19.2,
+                                      ladder.data = NULL) {
   
-  # n.rounds <- fixture.season %>% unique() %>% length()
   n.teams <- 
     append(fixture.season$team.home, fixture.season$team.away) %>% 
       unique() %>% 
@@ -792,17 +777,9 @@ SimulateFullSeasonEloMany <- function(season,
         rating.time.series,
         margin.error.sigma,
         lose.score.mu,
-        lose.score.sigma
+        lose.score.sigma,
+        ladder.data
       )
-    
-    # sim.data <- SimulateSeasonElo(season, fixture.season, team.data, ground.data, ground.location, travel.distance)
-    
-    # Sim results:
-    # finals = finals,
-    # ladder.data = ladder.data,
-    # team.data = team.data,
-    # ground.data = ground.data,
-    # rating.time.series = rating.time.series
     
     ladder.many <- 
       rbind(

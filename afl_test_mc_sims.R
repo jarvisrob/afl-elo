@@ -1,20 +1,34 @@
+# Run all the prep stuff first
+source("test.R")
+
 # Getting 2019 fixture
 fixture.2019 <- ScrapeAFLTablesSeasonFixture(2019)
 fixture.2019[108, "team.away"] <- "St Kilda"
 fixture.2019[108, "ground"] <- "Riverway Stadium"
 
+# Get current ladder
+ladder.data <- ScrapeAflTablesLadder(2019)
+
+# Limit fixture to start at next round, need to edit manually for now
+fixture.2019 <- ExtractRemainingSeasonFixture(fixture.2019, 7)
+
+
+print("--- Test MC many full season sims")
+
+print("Team ratings before starting sim")
+team.data.run %>%
+  rownames_to_column("team") %>%
+  filter(yes.active) %>%
+  arrange(desc(rating)) %>%
+  dplyr::select(team, rating) %>%
+  print()
+
+print(ladder.data)
+
+
 # Testing MC sims
 n.itns <- 100
-check.team <- "melbourne"
-
-team.ratings <- 
-  team.data.run %>%
-    rownames_to_column("team") %>%
-    filter(yes.active) %>%
-    arrange(desc(rating)) %>%
-    dplyr::select(team, rating)
-
-print(team.ratings)
+check.team <- "geelong"
 
 print(Sys.time())
 print(paste0("Starting MC sims for ", n.itns, " iterations"))
@@ -34,7 +48,8 @@ sim.many <-
     rating.time.series.run,
     score.params$margin.error.sigma,
     score.params$lose.score.mu,
-    score.params$lose.score.sigma
+    score.params$lose.score.sigma,
+    ladder.data
   )
 toc()
 print("Iterations complete")
@@ -74,3 +89,4 @@ print(
     p.flag
   )
 )
+
