@@ -122,7 +122,7 @@ ScrapeAflTablesLadder <- function(season) {
       "goals.behinds.against",
       "score.against",
       "percentage",
-      "prem.points"
+      "prem.pts"
     )
   
   ladder.data <- 
@@ -134,7 +134,7 @@ ScrapeAflTablesLadder <- function(season) {
       won, 
       lost,
       drawn, 
-      prem.points,
+      prem.pts,
       score.for, 
       score.against, 
       ladder.posn
