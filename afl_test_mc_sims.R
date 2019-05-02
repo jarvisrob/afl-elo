@@ -27,8 +27,7 @@ print(ladder.data)
 
 
 # Testing MC sims
-n.itns <- 100
-check.team <- "geelong"
+n.itns <- 15000
 
 print(Sys.time())
 print(paste0("Starting MC sims for ", n.itns, " iterations"))
@@ -54,6 +53,10 @@ sim.many <-
 toc()
 print("Iterations complete")
 
+
+print("--- Postproc of results")
+
+check.team <- "geelong"
 
 plt <- 
   sim.many$ladder.many %>%
