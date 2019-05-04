@@ -17,7 +17,7 @@ source("afltables_scrape.R")
 source("afl_fixture_manipulation.R")
 
 # Prediction run (all games to today) or testing run (games until end 2018)
-yes.pred.run <- FALSE
+yes.pred.run <- TRUE
 
 # Download the list of all games from AFL tables?
 do.download = TRUE
@@ -81,22 +81,57 @@ result.mae <- result.sum.abs.error / sum(all.games$season >= 1994)
 brier.score.ave <- brier.cumulative.error / sum(all.games$season >= 1994)
 log.score.ave <- log.score.cumulative.error / sum(all.games$season >= 1994)
 
-writeLines(c(paste0("Margin RMSE = ", margin.rmse), paste0("Margin MAE = ", margin.mae), paste0("Result MAE = ", result.mae),
-             paste0("Brier score ave = ", brier.score.ave), paste0("Log score ave = ", log.score.ave)))
+writeLines(
+  c(
+    paste0("Margin RMSE = ", margin.rmse), 
+    paste0("Margin MAE = ", margin.mae), 
+    paste0("Result MAE = ", result.mae),
+    paste0("Brier score ave = ", brier.score.ave), 
+    paste0("Log score ave = ", log.score.ave)
+  )
+)
 
-# Games and results of interest: 1994-2016
+# Games and results of interest: 1994-2018
 if (!yes.pred.run) {
+  
   games.1994.2016 <- all.games %>% filter(season >= 1994)
   elo.1994.2016 <- all.games.elo.run %>% filter(all.games$season >= 1994)
   elo.1994.2016.rs <- SelectHomeOrAwayValueRandom(elo.1994.2016, c('margin.exp', 'margin.act', 'margin.error'))
   calib.1994.2016 <- CheckCalibration(elo.1994.2016, 0.05)
+  
 } else {
-  fixture <- LoadRoundFixture()
-  PredictRound(fixture, 2019, "R6", all.games, team.data.run, ground.data.run, ground.location, travel.distance, team.dictionary.reverse, commission = 0.05,
-               param.spread = 400,
-               param.margin = 0.03213133,
-               param.coeff.travel = 14.01393, param.power.travel = 0.2689826,
-               con = 'out/afl_elo_pred_2019-R6.txt')
-               # con = stdout())
+  
+  season <- 2019
+  rnd <- 7
+  
+  # For R13, if AFL Tables hasn't yet added the venue for GC v STK, will need to
+  # manually add it:
+  # fixture.season[108, "team.away"] <- "St Kilda"
+  # fixture.season[108, "ground"] <- "Riverway Stadium"
+  
+  ScrapeAFLTablesSeasonFixture(season) %>%
+    ExtractRoundFixture(rnd) %>% 
+      mutate(
+        team.home = map_chr(team.home, ~team.dictionary[[.]]), 
+        team.away = map_chr(team.away, ~team.dictionary[[.]])
+      ) %>%
+    PredictRound(
+      season, 
+      str_c("R", rnd), 
+      all.games, 
+      team.data.run, 
+      ground.data.run, 
+      ground.location, 
+      travel.distance, 
+      team.dictionary.reverse, 
+      commission = 0.05,
+      param.spread = 400,
+      param.margin = 0.03213133,
+      param.coeff.travel = 14.01393,
+      param.power.travel = 0.2689826,
+      con = str_c("out/afl_elo_pred_", season, "-R", rnd, ".txt")
+      # con = stdout()
+    )
+  
 }
 
