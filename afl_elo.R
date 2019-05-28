@@ -279,6 +279,7 @@ RunElo <- function(all.games,
       team.data <- setup$team.data
       rating.time.series <- setup$rating.time.series
       
+      # TODO: Make this season a variable rather than being hardcoded
       # Start calibration/optimisation for 1994 season
       if (season.current == 1994) {
         margin.cumulative.abs.error <- 0

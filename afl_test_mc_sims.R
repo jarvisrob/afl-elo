@@ -27,7 +27,7 @@ print(ladder.data)
 
 
 # Testing MC sims
-n.itns <- 15000
+n.itns <- 20000
 
 print(Sys.time())
 print(paste0("Starting MC sims for ", n.itns, " iterations"))

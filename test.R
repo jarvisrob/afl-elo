@@ -24,9 +24,9 @@ do.download = TRUE
 
 # Init
 all.games <- GetAllGames(do.download = do.download)
-# if (!yes.pred.run) {
-#   all.games <- all.games %>% filter(season <= 2018)
-# }
+if (!yes.pred.run) {
+  all.games <- all.games %>% filter(season <= 2017)
+}
 all.games.elo <- InitAllGamesElo(all.games)
 team.dictionary <- InitTeamLDictionary()
 team.dictionary.reverse <- InitTeamDictionaryReverse()
@@ -102,7 +102,7 @@ if (!yes.pred.run) {
 } else {
   
   season <- 2019
-  rnd <- 7
+  rnd <- 11
   
   # For R13, if AFL Tables hasn't yet added the venue for GC v STK, will need to
   # manually add it:

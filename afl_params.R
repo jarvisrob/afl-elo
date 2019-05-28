@@ -16,7 +16,7 @@ elo.params <-
 # Scoring parameters
 score.params <- 
   list(
-    margin.error.sigma = 38.5, 
+    margin.error.sigma = 38.5,  # This should be = 1/elo.params$margin
     lose.score.mu = 75.2, 
     lose.score.sigma = 19.2
 )
