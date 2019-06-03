@@ -92,7 +92,7 @@ PredictGame <- function(team.home,
 
   # Calculate the difference in adj ratings and the expected result and margin
   delta.ratings <- rating.home.adj - rating.away.adj
-  result.exp.home <- CalculateResultExp(delta.ratings, param.spread)
+  result.exp.home <- CalculateResultExp(delta.ratings, param.margin)
   result.exp.away <- 1 - result.exp.home
   margin.exp.home <- CalculateMarginExp(delta.ratings, param.spread, param.margin)
   margin.exp.away <- -margin.exp.home

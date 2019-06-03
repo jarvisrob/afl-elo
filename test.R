@@ -17,7 +17,7 @@ source("afltables_scrape.R")
 source("afl_fixture_manipulation.R")
 
 # Prediction run (all games to today) or testing run (games until end 2018)
-yes.pred.run <- TRUE
+yes.pred.run <- FALSE
 
 # Download the list of all games from AFL tables?
 do.download = TRUE
@@ -40,6 +40,28 @@ travel.distance <- InitTravelDistance()
 # Run Elo
 print("Starting Elo run ...")
 tic()
+# elo.result <- 
+#   RunElo(
+#     all.games, 
+#     team.dictionary, 
+#     team.data,
+#     ground.location, 
+#     ground.data, 
+#     travel.distance,
+#     rating.time.series, 
+#     all.games.elo,
+#     elo.params,
+#     param.rating.mean = 1500, 
+#     param.spread = 400,
+#     param.margin = 0.03213133,
+#     param.coeff.rating.update = 76.72256, 
+#     param.regress.rating = 0.2038160,
+#     param.coeff.ground.update = 1.675048,
+#     param.coeff.travel = 14.01393, 
+#     param.power.travel = 0.2689826,
+#     param.rating.expansion.init = 1330,
+#     do.store.detail = TRUE
+#   )
 elo.result <- 
   RunElo(
     all.games, 
@@ -51,15 +73,15 @@ elo.result <-
     rating.time.series, 
     all.games.elo,
     elo.params,
-    param.rating.mean = 1500, 
-    param.spread = 400,
-    param.margin = 0.03213133,
-    param.coeff.rating.update = 76.72256, 
-    param.regress.rating = 0.2038160,
-    param.coeff.ground.update = 1.675048,
-    param.coeff.travel = 14.01393, 
-    param.power.travel = 0.2689826,
-    param.rating.expansion.init = 1330,
+    param.rating.mean = 0,
+    param.spread = 0,
+    param.margin = 40.0,
+    param.coeff.rating.update = 7.513081,
+    param.regress.rating = 0.45,
+    param.coeff.ground.update = 0,
+    param.coeff.travel = 3.789600,
+    param.power.travel = 0,
+    param.rating.expansion.init = -15.060289,
     do.store.detail = TRUE
   )
 toc()
@@ -102,7 +124,7 @@ if (!yes.pred.run) {
 } else {
   
   season <- 2019
-  rnd <- 11
+  rnd <- 12
   
   # For R13, if AFL Tables hasn't yet added the venue for GC v STK, will need to
   # manually add it:
@@ -115,6 +137,23 @@ if (!yes.pred.run) {
         team.home = map_chr(team.home, ~team.dictionary[[.]]), 
         team.away = map_chr(team.away, ~team.dictionary[[.]])
       ) %>%
+    # PredictRound(
+    #   season, 
+    #   str_c("R", rnd), 
+    #   all.games, 
+    #   team.data.run, 
+    #   ground.data.run, 
+    #   ground.location, 
+    #   travel.distance, 
+    #   team.dictionary.reverse, 
+    #   commission = 0.05,
+    #   param.spread = 400,
+    #   param.margin = 0.03213133,
+    #   param.coeff.travel = 14.01393,
+    #   param.power.travel = 0.2689826,
+    #   con = str_c("out/afl_elo_pred_", season, "-R", rnd, ".txt")
+    #   # con = stdout()
+    # )
     PredictRound(
       season, 
       str_c("R", rnd), 
@@ -125,11 +164,11 @@ if (!yes.pred.run) {
       travel.distance, 
       team.dictionary.reverse, 
       commission = 0.05,
-      param.spread = 400,
-      param.margin = 0.03213133,
-      param.coeff.travel = 14.01393,
-      param.power.travel = 0.2689826,
-      con = str_c("out/afl_elo_pred_", season, "-R", rnd, ".txt")
+      param.spread = 0,
+      param.margin = 40.0,
+      param.coeff.travel = 3.789600,
+      param.power.travel = 0,
+      con = str_c("out/NEW_afl_elo_pred_", season, "-R", rnd, ".txt")
       # con = stdout()
     )
   
