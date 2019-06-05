@@ -16,13 +16,13 @@ elo.params <-
   list(
     rating.mean = 0,
     spread = 0,
-    margin = 40.0,
-    coeff.rating.update = 7.513081,
-    regress.rating = 0.45,
+    margin = 38.1106781,
+    coeff.rating.update = 11.2616037,
+    regress.rating = 0.1229297,
     coeff.ground.update = 0,
-    coeff.travel = 3.789600,
+    coeff.travel = 1.9832856,
     power.travel = 0,
-    rating.expansion.init = -15.060289
+    rating.expansion.init = -25.6595598
   )
   
 
@@ -36,7 +36,7 @@ elo.params <-
 
 score.params <- 
   list(
-    margin.error.sigma = 40.0,
+    margin.error.sigma = 38.1106781,
     lose.score.mu = 75.2, 
     lose.score.sigma = 19.2
   )

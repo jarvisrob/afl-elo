@@ -22,6 +22,9 @@ yes.pred.run <- FALSE
 # Download the list of all games from AFL tables?
 do.download = TRUE
 
+# Season to start tuning from
+season.start.tuning <- 2000
+
 # Init
 all.games <- GetAllGames(do.download = do.download)
 if (!yes.pred.run) {
@@ -75,13 +78,13 @@ elo.result <-
     elo.params,
     param.rating.mean = 0,
     param.spread = 0,
-    param.margin = 40.0,
-    param.coeff.rating.update = 7.513081,
-    param.regress.rating = 0.45,
+    param.margin = 38.1106781,
+    param.coeff.rating.update = 11.2616037,
+    param.regress.rating = 0.1229297,
     param.coeff.ground.update = 0,
-    param.coeff.travel = 3.789600,
+    param.coeff.travel = 1.9832856,
     param.power.travel = 0,
-    param.rating.expansion.init = -15.060289,
+    param.rating.expansion.init = -25.6595598,
     do.store.detail = TRUE
   )
 toc()
@@ -97,11 +100,11 @@ brier.cumulative.error <- elo.result[[7]]
 log.score.cumulative.error <- elo.result[[8]]
 margin.cumulative.sq.error <- elo.result[[9]]
 
-margin.rmse <- sqrt(margin.cumulative.sq.error / sum(all.games$season >= 1994))
-margin.mae <- margin.sum.abs.error / sum(all.games$season >= 1994)
-result.mae <- result.sum.abs.error / sum(all.games$season >= 1994)
-brier.score.ave <- brier.cumulative.error / sum(all.games$season >= 1994)
-log.score.ave <- log.score.cumulative.error / sum(all.games$season >= 1994)
+margin.rmse <- sqrt(margin.cumulative.sq.error / sum(all.games$season >= season.start.tuning))
+margin.mae <- margin.sum.abs.error / sum(all.games$season >= season.start.tuning)
+result.mae <- result.sum.abs.error / sum(all.games$season >= season.start.tuning)
+brier.score.ave <- brier.cumulative.error / sum(all.games$season >= season.start.tuning)
+log.score.ave <- log.score.cumulative.error / sum(all.games$season >= season.start.tuning)
 
 writeLines(
   c(
@@ -116,10 +119,10 @@ writeLines(
 # Games and results of interest: 1994-2018
 if (!yes.pred.run) {
   
-  games.1994.2016 <- all.games %>% filter(season >= 1994)
-  elo.1994.2016 <- all.games.elo.run %>% filter(all.games$season >= 1994)
+  games.1994.2016 <- all.games %>% filter(season >= season.start.tuning)
+  elo.1994.2016 <- all.games.elo.run %>% filter(all.games$season >= season.start.tuning)
   elo.1994.2016.rs <- SelectHomeOrAwayValueRandom(elo.1994.2016, c('margin.exp', 'margin.act', 'margin.error'))
-  calib.1994.2016 <- CheckCalibration(elo.1994.2016, 0.05)
+  calib.1994.2016 <- CheckCalibration(elo.1994.2016, season.start.tuning)
   
 } else {
   
@@ -165,8 +168,8 @@ if (!yes.pred.run) {
       team.dictionary.reverse, 
       commission = 0.05,
       param.spread = 0,
-      param.margin = 40.0,
-      param.coeff.travel = 3.789600,
+      param.margin = 38.1106781,
+      param.coeff.travel = 1.9832856,
       param.power.travel = 0,
       con = str_c("out/NEW_afl_elo_pred_", season, "-R", rnd, ".txt")
       # con = stdout()

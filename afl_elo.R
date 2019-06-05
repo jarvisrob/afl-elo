@@ -15,10 +15,8 @@ CalculateTravelAdj <- function(team,
   team.location <- team.data[team, 'location']
   distance <- travel.distance[ground.location[ground, ], team.location]
   
-  # travel.adj <- -param.coeff.travel * (distance ^ param.power.travel)
-  travel.adj <- -param.coeff.travel * log(1 + distance)
-  
-  travel.adj
+  travel.adj <- -param.coeff.travel * (distance ^ param.power.travel)
+
 }
 
 
@@ -286,8 +284,8 @@ RunElo <- function(all.games,
       rating.time.series <- setup$rating.time.series
       
       # TODO: Make this season a variable rather than being hardcoded
-      # Start calibration/optimisation for 1994 season
-      if (season.current == 1994) {
+      # Start calibration/optimisation for 2000 season
+      if (season.current == 2000) {
         margin.cumulative.abs.error <- 0
         result.cumulative.abs.error <- 0
         brier.cumulative.error <- 0
