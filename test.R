@@ -16,7 +16,7 @@ source("afl_parse_excel_fixture.R")
 source("afltables_scrape.R")
 source("afl_fixture_manipulation.R")
 
-# Prediction run (all games to today) or testing run (games until end 2018)
+# Prediction run (all games to today) or testing run (games until end 2017)
 yes.pred.run <- FALSE
 
 # Download the list of all games from AFL tables?
@@ -25,10 +25,13 @@ do.download = TRUE
 # Season to start tuning from
 season.start.tuning <- 2000
 
+# Season to end tuning
+season.end.tuning <- 2017
+
 # Init
 all.games <- GetAllGames(do.download = do.download)
 if (!yes.pred.run) {
-  all.games <- all.games %>% filter(season <= 2017)
+  all.games <- all.games %>% filter(season <= season.end.tuning)
 }
 all.games.elo <- InitAllGamesElo(all.games)
 team.dictionary <- InitTeamLDictionary()
@@ -78,13 +81,13 @@ elo.result <-
     elo.params,
     param.rating.mean = 0,
     param.spread = 0,
-    param.margin = 38.1106781,
-    param.coeff.rating.update = 11.2616037,
-    param.regress.rating = 0.1229297,
-    param.coeff.ground.update = 0,
-    param.coeff.travel = 1.9832856,
-    param.power.travel = 0,
-    param.rating.expansion.init = -25.6595598,
+    param.margin = 36.8455546,
+    param.coeff.rating.update = 10.2963909,
+    param.regress.rating = 0.1567977,
+    param.coeff.ground.update = 0.2452136,
+    param.coeff.travel = 0.9507260,
+    param.power.travel = 0.3492311,
+    param.rating.expansion.init = -78.7120968,
     do.store.detail = TRUE
   )
 toc()
@@ -119,44 +122,95 @@ writeLines(
 # Games and results of interest: 1994-2018
 if (!yes.pred.run) {
   
-  games.1994.2016 <- all.games %>% filter(season >= season.start.tuning)
-  elo.1994.2016 <- all.games.elo.run %>% filter(all.games$season >= season.start.tuning)
-  elo.1994.2016.rs <- SelectHomeOrAwayValueRandom(elo.1994.2016, c('margin.exp', 'margin.act', 'margin.error'))
-  calib.1994.2016 <- CheckCalibration(elo.1994.2016, season.start.tuning)
+  # games.1994.2016 <- all.games %>% filter(season >= season.start.tuning)
+  # elo.1994.2016 <- all.games.elo.run %>% filter(all.games$season >= season.start.tuning)
+  # elo.1994.2016.rs <- SelectHomeOrAwayValueRandom(elo.1994.2016, c('margin.exp', 'margin.act', 'margin.error'))
+  # calib.1994.2016 <- CheckCalibration(elo.1994.2016, 0.05)
   
+  tuning_games <-
+    all.games.elo.run %>%
+      mutate(season = all.games$season) %>%
+      filter(season >= season.start.tuning) %>%
+      dplyr::select(
+        season,
+        team.home, 
+        team.away, 
+        delta.rating.home, 
+        margin.act.home,
+        margin.error.home,
+        result.exp.home, 
+        outcome.home,
+        result.exp.away, 
+        outcome.away, 
+        brier.game
+      ) %>%
+      rename(
+        home = team.home,
+        away = team.away,
+        margin_expected = delta.rating.home,
+        margin_actual = margin.act.home,
+        margin_error = margin.error.home,
+        p_home_win = result.exp.home,
+        outcome_home = outcome.home,
+        p_away_win = result.exp.away,
+        outcome_away = outcome.away,
+        brier = brier.game
+      )
+  
+  tuning_games_home <-
+    tuning_games %>%
+      dplyr::select(p_home_win, outcome_home) %>% 
+      rename(p = p_home_win, outcome = outcome_home)
+  
+  tuning_games_away <-
+    tuning_games %>%
+      dplyr::select(p_away_win, outcome_away) %>% 
+      rename(p = p_away_win, outcome = outcome_away)
+  
+  tuning_games_pred_act <- union(tuning_games_home, tuning_games_away)
+  
+  n_preds <- tuning_games_pred_act %>% nrow()
+  
+  plt <-
+    tuning_games_pred_act %>%
+      group_by(cut(p, breaks = seq(0, 1, 0.05))) %>%
+      summarize(n(), sum(outcome)) %>%
+      rename(bin = `cut(p, breaks = seq(0, 1, 0.05))`, n_games = `n()`, n_wins = `sum(outcome)`) %>%
+      mutate(bin_centre = seq(0.025, 0.975, 0.05), win_fraction = n_wins / n_games) %>%
+      ggplot(aes(bin_centre, win_fraction)) +
+        geom_point() +
+        geom_abline(slope = 1, intercept = 0) +
+        scale_x_continuous(limits = c(0, 1)) +
+        labs(
+          x = "Predicted probability",
+          y = "Actual win fraction",
+          title = "Calibration on tuning data"
+        )
+  print(plt)
+  
+
 } else {
   
   season <- 2019
-  rnd <- 12
+  rnd <- 20
   
   # For R13, if AFL Tables hasn't yet added the venue for GC v STK, will need to
   # manually add it:
   # fixture.season[108, "team.away"] <- "St Kilda"
   # fixture.season[108, "ground"] <- "Riverway Stadium"
   
-  ScrapeAFLTablesSeasonFixture(season) %>%
+  fixture.season <-
+    ScrapeAFLTablesSeasonFixture(season)
+  
+  fixture.season[108, "team.away"] <- "St Kilda"
+  fixture.season[108, "ground"] <- "Riverway Stadium"
+  
+  fixture.season %>%
     ExtractRoundFixture(rnd) %>% 
       mutate(
         team.home = map_chr(team.home, ~team.dictionary[[.]]), 
         team.away = map_chr(team.away, ~team.dictionary[[.]])
       ) %>%
-    # PredictRound(
-    #   season, 
-    #   str_c("R", rnd), 
-    #   all.games, 
-    #   team.data.run, 
-    #   ground.data.run, 
-    #   ground.location, 
-    #   travel.distance, 
-    #   team.dictionary.reverse, 
-    #   commission = 0.05,
-    #   param.spread = 400,
-    #   param.margin = 0.03213133,
-    #   param.coeff.travel = 14.01393,
-    #   param.power.travel = 0.2689826,
-    #   con = str_c("out/afl_elo_pred_", season, "-R", rnd, ".txt")
-    #   # con = stdout()
-    # )
     PredictRound(
       season, 
       str_c("R", rnd), 
@@ -168,10 +222,10 @@ if (!yes.pred.run) {
       team.dictionary.reverse, 
       commission = 0.05,
       param.spread = 0,
-      param.margin = 38.1106781,
-      param.coeff.travel = 1.9832856,
-      param.power.travel = 0,
-      con = str_c("out/NEW_afl_elo_pred_", season, "-R", rnd, ".txt")
+      param.margin = 36.8455546,
+      param.coeff.travel = 0.9507260,
+      param.power.travel = 0.3492311,
+      con = str_c("out/afl_elo_pred_", season, "-R", rnd, ".txt")
       # con = stdout()
     )
   

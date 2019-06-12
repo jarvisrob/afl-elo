@@ -10,7 +10,7 @@ fixture.2019[108, "ground"] <- "Riverway Stadium"
 ladder.data <- ScrapeAflTablesLadder(2019)
 
 # Limit fixture to start at next round, need to edit manually for now
-fixture.2019 <- ExtractRemainingSeasonFixture(fixture.2019, 7)
+fixture.2019 <- ExtractRemainingSeasonFixture(fixture.2019, 17)
 
 
 print("--- Test MC many full season sims")
@@ -27,7 +27,7 @@ print(ladder.data)
 
 
 # Testing MC sims
-n.itns <- 20000
+n.itns <- 5000
 
 print(Sys.time())
 print(paste0("Starting MC sims for ", n.itns, " iterations"))
@@ -56,7 +56,7 @@ print("Iterations complete")
 
 print("--- Postproc of results")
 
-check.team <- "geelong"
+check.team <- "essendon"
 
 plt <- 
   sim.many$ladder.many %>%
@@ -92,4 +92,40 @@ print(
     p.flag
   )
 )
+
+
+# ladder_posn_prob <- 
+#   sim.many$ladder.many %>%
+#   filter(team == team_of_interest) %>%
+#   group_by(ladder.posn) %>%
+#   count() %>%
+#   mutate(p = n/n_itns)
+# 
+# ladder_posn_prob %>%
+#   ggplot(aes(ladder.posn, p)) + 
+#   geom_col() +
+#   ggtitle(
+#     paste0(
+#       "Probability of end ladder position for ", 
+#       team_of_interest
+#     )
+#   ) +
+#   xlab("Ladder position") +
+#   ylab("Probability")
+# 
+# tibble(
+#   event = c(
+#     "Top of ladder (Minor premiers)",
+#     "Top 4 (2nd chance in finals)",
+#     "Top 8 (Play in finals)"
+#     #"Bottom of ladder (Wooden spoon)"
+#   ),
+#   p = c(
+#     ladder_posn_prob %>% filter(ladder.posn == 1) %>% pull(p),
+#     ladder_posn_prob %>% filter(ladder.posn <= 4) %>% pull(p) %>% sum(),
+#     ladder_posn_prob %>% filter(ladder.posn <= 8) %>% pull(p) %>% sum()
+#     ladder_posn_prob %>% filter(ladder.posn == 16) %>% pull(p)
+#   )
+# )
+# 
 
