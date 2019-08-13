@@ -1,8 +1,7 @@
-
 # Load packages
 library(tictoc)
-library(tidyverse)
 library(MASS)
+library(tidyverse)
 
 # Source
 source('afltables_all_games_prep.R')
@@ -46,28 +45,6 @@ travel.distance <- InitTravelDistance()
 # Run Elo
 print("Starting Elo run ...")
 tic()
-# elo.result <- 
-#   RunElo(
-#     all.games, 
-#     team.dictionary, 
-#     team.data,
-#     ground.location, 
-#     ground.data, 
-#     travel.distance,
-#     rating.time.series, 
-#     all.games.elo,
-#     elo.params,
-#     param.rating.mean = 1500, 
-#     param.spread = 400,
-#     param.margin = 0.03213133,
-#     param.coeff.rating.update = 76.72256, 
-#     param.regress.rating = 0.2038160,
-#     param.coeff.ground.update = 1.675048,
-#     param.coeff.travel = 14.01393, 
-#     param.power.travel = 0.2689826,
-#     param.rating.expansion.init = 1330,
-#     do.store.detail = TRUE
-#   )
 elo.result <- 
   RunElo(
     all.games, 
@@ -81,13 +58,13 @@ elo.result <-
     elo.params,
     param.rating.mean = 0,
     param.spread = 0,
-    param.margin = 36.8455546,
-    param.coeff.rating.update = 10.2963909,
-    param.regress.rating = 0.1567977,
-    param.coeff.ground.update = 0.2452136,
-    param.coeff.travel = 0.9507260,
-    param.power.travel = 0.3492311,
-    param.rating.expansion.init = -78.7120968,
+    param.margin = 36.84553274,
+    param.coeff.rating.update = 10.29627330,
+    param.regress.rating = 0.15732180,
+    param.coeff.ground.update = 0.24685585,
+    param.coeff.travel = 0.92211573,
+    param.power.travel = 0.35214608,
+    param.rating.expansion.init = -79.06871615,
     do.store.detail = TRUE
   )
 toc()
@@ -121,12 +98,6 @@ writeLines(
 
 # Games and results of interest: 1994-2018
 if (!yes.pred.run) {
-  
-  # games.1994.2016 <- all.games %>% filter(season >= season.start.tuning)
-  # elo.1994.2016 <- all.games.elo.run %>% filter(all.games$season >= season.start.tuning)
-  # elo.1994.2016.rs <- SelectHomeOrAwayValueRandom(elo.1994.2016, c('margin.exp', 'margin.act', 'margin.error'))
-  # calib.1994.2016 <- CheckCalibration(elo.1994.2016, 0.05)
-  
   tuning_games <-
     all.games.elo.run %>%
       mutate(season = all.games$season) %>%
@@ -192,7 +163,7 @@ if (!yes.pred.run) {
 } else {
   
   season <- 2019
-  rnd <- 20
+  rnd <- 21
   
   # For R13, if AFL Tables hasn't yet added the venue for GC v STK, will need to
   # manually add it:
@@ -222,9 +193,9 @@ if (!yes.pred.run) {
       team.dictionary.reverse, 
       commission = 0.05,
       param.spread = 0,
-      param.margin = 36.8455546,
-      param.coeff.travel = 0.9507260,
-      param.power.travel = 0.3492311,
+      param.margin = 36.84553274,
+      param.coeff.travel = 0.92211573,
+      param.power.travel = 0.35214608,
       con = str_c("out/afl_elo_pred_", season, "-R", rnd, ".txt")
       # con = stdout()
     )
