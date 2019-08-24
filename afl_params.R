@@ -1,24 +1,20 @@
-# Elo parameters
+
 elo.params <- 
   list(
-    rating.mean = 1500,
-    spread = 400,
-    margin = 0.03213133,
-    coeff.rating.update = 76.72256,
-    regress.rating = 0.2038160,
-    coeff.ground.update = 1.675048,
-    coeff.travel = 14.01393,
-    power.travel = 0.2689826,
-    rating.expansion.init = 1330
-)
-  
+    rating.mean = 0,
+    spread = 0,
+    margin = 36.84553274,
+    coeff.rating.update = 10.29627330,
+    regress.rating = 0.15732180,
+    coeff.ground.update = 0.24685585,
+    coeff.travel = 0.92211573,
+    power.travel = 0.35214608,
+    rating.expansion.init = -79.06871615
+  )
 
-# Scoring parameters
 score.params <- 
   list(
-    margin.error.sigma = 38.5, 
+    margin.error.sigma = 36.84553274,
     lose.score.mu = 75.2, 
     lose.score.sigma = 19.2
-)
-
-
+  )

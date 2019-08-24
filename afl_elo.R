@@ -16,26 +16,30 @@ CalculateTravelAdj <- function(team,
   distance <- travel.distance[ground.location[ground, ], team.location]
   
   travel.adj <- -param.coeff.travel * (distance ^ param.power.travel)
-  
-  travel.adj
+
 }
 
 
-CalculateResultExp <- function(delta.ratings, param.spread) {
+CalculateResultExp <- function(delta.ratings, param.margin) {
   #result.exp <- 1 / (10 ^ (-delta.ratings / param.spread) + 1)
-  result.exp <- pnorm(delta.ratings, mean = 0, sd = param.spread / 2 * sqrt(2))
+  # result.exp <- pnorm(delta.ratings, mean = 0, sd = param.spread / 2 * sqrt(2))
+  result.exp <- pnorm(delta.ratings/param.margin, mean = 0, sd = 1)
+  # TODO: param.margin at the moment is actually sd of margin from estimate--badly named
 }
 
 
 CalculateMarginExp <- function(delta.ratings, param.spread, param.margin) {
   #margin.exp <- delta.ratings / (param.margin * param.spread)
-  margin.exp <- delta.ratings / (param.margin * param.spread / 2 * sqrt(2)) # TODO CHECK THIS!!! Works, but need to do maths...
+  # margin.exp <- delta.ratings / (param.margin * param.spread / 2 * sqrt(2)) # TODO CHECK THIS!!! Works, but need to do maths...
+  margin.exp <- delta.ratings
 }
 
 
 CalculateResultAct <- function(margin.act, param.margin) {
   #result.act <- 1 / (10 ^ (-param.margin * margin.act) + 1)
-  result.act <- pnorm(param.margin * margin.act, mean = 0, sd = 1) # TODO CHECK THIS!!! Works, but need to do maths...
+  # result.act <- pnorm(param.margin * margin.act, mean = 0, sd = 1) # TODO CHECK THIS!!! Works, but need to do maths...
+  result.act <- pnorm(margin.act/param.margin, mean = 0, sd = 1)
+  # TODO: param.margin at the moment is actually sd of margin from estimate--badly named
 }
 
 
@@ -166,7 +170,7 @@ DoGameElo <- function(game.info,
   # Calculate the difference in adj ratings and the expected result and margin
   delta.rating.home <- rating.adj.home - rating.adj.away
   delta.rating.away <- rating.adj.away - rating.adj.home
-  result.exp.home <- CalculateResultExp(delta.rating.home, param.spread)
+  result.exp.home <- CalculateResultExp(delta.rating.home, param.margin)
   result.exp.away <- 1 - result.exp.home
   margin.exp.home <- CalculateMarginExp(delta.rating.home, param.spread, param.margin)
   margin.exp.away <- -margin.exp.home
@@ -279,8 +283,9 @@ RunElo <- function(all.games,
       team.data <- setup$team.data
       rating.time.series <- setup$rating.time.series
       
-      # Start calibration/optimisation for 1994 season
-      if (season.current == 1994) {
+      # TODO: Make this season a variable rather than being hardcoded
+      # Start calibration/optimisation for 2000 season
+      if (season.current == 2000) {
         margin.cumulative.abs.error <- 0
         result.cumulative.abs.error <- 0
         brier.cumulative.error <- 0
@@ -316,7 +321,7 @@ RunElo <- function(all.games,
     # Calculate the difference in adj ratings and the expected result and margin
     delta.rating.home <- rating.adj.home - rating.adj.away
     delta.rating.away <- rating.adj.away - rating.adj.home
-    result.exp.home <- CalculateResultExp(delta.rating.home, param.spread)
+    result.exp.home <- CalculateResultExp(delta.rating.home, param.margin)
     result.exp.away <- 1 - result.exp.home
     margin.exp.home <- CalculateMarginExp(delta.rating.home, param.spread, param.margin)
     margin.exp.away <- -margin.exp.home
